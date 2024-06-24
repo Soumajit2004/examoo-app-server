@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { UserProfile } from './user-profile.entity';
 
 @Entity()
 export class User {
@@ -10,4 +17,8 @@ export class User {
 
   @Column()
   password: string;
+
+  @OneToOne(() => UserProfile)
+  @JoinColumn()
+  profile: UserProfile;
 }
