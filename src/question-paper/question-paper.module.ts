@@ -13,10 +13,12 @@ import { McqOption } from './entites/answers/mcq/mcq-option.entity';
 import { McqResponse } from './entites/answers/mcq/mcq-response.entity';
 import { TextResponse } from './entites/answers/text/text-response.entity';
 import { NumericalResponse } from './entites/answers/numerical/numerical-response.entity';
+import { QuestionPaper } from './entites/question-paper.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      QuestionPaper,
       Question,
       McqAnswer,
       McqResponse,
