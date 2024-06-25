@@ -7,7 +7,7 @@ import { QuestionController } from './controllers/question.controller';
 import { QuestionService } from './services/question.service';
 import { Question } from './entites/question.entity';
 import { McqAnswer } from './entites/answers/mcq/mcq-answer.entity';
-import { TextAnswer } from './entites/answers/text-answer.entity';
+import { TextAnswer } from './entites/answers/text/text-answer.entity';
 import { NumericalAnswer } from './entites/answers/numerical-answer.entity';
 import { McqOption } from './entites/answers/mcq/mcq-option.entity';
 import { McqResponse } from './entites/answers/mcq/mcq-response.entity';

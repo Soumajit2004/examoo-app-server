@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { McqAnswer } from './answers/mcq/mcq-answer.entity';
-import { TextAnswer } from './answers/text-answer.entity';
+import { TextAnswer } from './answers/text/text-answer.entity';
 import { NumericalAnswer } from './answers/numerical-answer.entity';
 
 export enum QuestionType {

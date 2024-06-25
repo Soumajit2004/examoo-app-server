@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { McqOption } from './mcq-option.entity';
+import { McqResponse } from './mcq-response.entity';
 
 @Entity()
 export class McqAnswer {
@@ -18,4 +19,7 @@ export class McqAnswer {
 
   @OneToMany(() => McqOption, (option) => option.parentAnswer, { eager: true })
   options: McqOption[];
+
+  @OneToMany(() => McqResponse, (response) => response.parentAnswer)
+  responses: McqResponse[];
 }
