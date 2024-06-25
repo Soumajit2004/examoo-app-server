@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -17,8 +18,7 @@ export class QuestionPaper {
   @Column()
   name: string;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToOne(() => User, (user) => user.questionPapers, { eager: true })
   owner: User;
 
   @Column({ default: new Date().toISOString() })
