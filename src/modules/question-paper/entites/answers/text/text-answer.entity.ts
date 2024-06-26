@@ -9,6 +9,8 @@ export class TextAnswer {
   @Column()
   correctText: string;
 
-  @OneToMany(() => TextResponse, (response) => response.parentAnswer)
+  @OneToMany(() => TextResponse, (response) => response.parentAnswer, {
+    eager: true,
+  })
   responses: TextResponse[];
 }
