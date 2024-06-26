@@ -1,7 +1,7 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 
 import { QuestionPaperRepository } from '../../../database/repositories/question-paper.repository';
@@ -16,22 +16,58 @@ export class QuestionPaperService {
     private readonly questionPaperRepository: QuestionPaperRepository,
   ) {}
 
-  async getQuestionPaperById(
+  async verifyReadAccess(
     questionPaperId: string,
     user: User,
-  ): Promise<QuestionPaper> {
-    const found = await this.questionPaperRepository.findOneBy({
+  ): Promise<boolean> {
+    const questionPaper = await this.questionPaperRepository.findOneBy({
+      id: questionPaperId,
+    });
+
+    const found = questionPaper.candidates.find((u) => {
+      return u.id === user.id;
+    });
+
+    if (!found) {
+      throw new ForbiddenException(
+        `no read access to question paper with id:${questionPaperId}`,
+      );
+    }
+
+    return !!found;
+  }
+
+  async verifyOwnerAccess(
+    questionPaperId: string,
+    user: User,
+  ): Promise<boolean> {
+    const hasAccess = await this.questionPaperRepository.findOneBy({
       id: questionPaperId,
       owner: user,
     });
 
-    if (!found) {
-      throw new NotFoundException(
-        `unable to find question paper with id: ${questionPaperId}`,
+    if (!hasAccess) {
+      throw new ForbiddenException(
+        `no owner access to question paper with id:${questionPaperId}`,
       );
     }
 
-    return found;
+    return !!hasAccess;
+  }
+
+  async getQuestionPaperById(
+    questionPaperId: string,
+    user: User,
+  ): Promise<QuestionPaper> {
+    const hasAccess = await this.verifyReadAccess(questionPaperId, user);
+
+    if (!hasAccess) {
+      throw new ForbiddenException(
+        `no read access to question paper with id: ${questionPaperId}`,
+      );
+    }
+
+    return this.questionPaperRepository.getQuestionPaperById(questionPaperId);
   }
 
   async createQuestionPaper(
@@ -49,12 +85,12 @@ export class QuestionPaperService {
     updateQuestionPaperDto: UpdateQuestionPaperDto,
     user: User,
   ): Promise<QuestionPaper> {
+    await this.verifyOwnerAccess(questionPaperId, user);
+
     const { name } = updateQuestionPaperDto;
 
-    const questionPaper = await this.getQuestionPaperById(
-      questionPaperId,
-      user,
-    );
+    const questionPaper =
+      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
 
     if (name) {
       questionPaper.name = name;

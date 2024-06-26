@@ -6,5 +6,6 @@ export class CreateQuestionDto {
   questionText: string;
 
   @IsEnum(QuestionType)
+  @IsNotEmpty()
   questionType: QuestionType;
 }

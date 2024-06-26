@@ -22,7 +22,7 @@ export class Question {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'mediumtext' })
   questionText: string;
 
   @ManyToOne(() => QuestionPaper, (questionPaper) => questionPaper.questions)

@@ -17,6 +17,7 @@ import { QuestionPaper } from './entites/question-paper.entity';
 import { QuestionPaperRepository } from '../../database/repositories/question-paper.repository';
 import { QuestionRepository } from '../../database/repositories/question.repository';
 import { AuthModule } from '../auth/auth.module';
+import { AnswerController } from './controllers/answer.controller';
 
 @Module({
   imports: [
@@ -39,6 +40,6 @@ import { AuthModule } from '../auth/auth.module';
     QuestionPaperRepository,
     QuestionRepository,
   ],
-  controllers: [QuestionPaperController, QuestionController],
+  controllers: [QuestionPaperController, QuestionController, AnswerController],
 })
 export class QuestionPaperModule {}

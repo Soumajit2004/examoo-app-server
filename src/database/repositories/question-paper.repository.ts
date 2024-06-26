@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
 import { QuestionPaper } from '../../modules/question-paper/entites/question-paper.entity';
@@ -9,6 +9,17 @@ import { User } from '../../modules/user/entites/user.entity';
 export class QuestionPaperRepository extends Repository<QuestionPaper> {
   constructor(private dataSource: DataSource) {
     super(QuestionPaper, dataSource.createEntityManager());
+  }
+  async getQuestionPaperById(questionPaperId: string) {
+    const found = await this.findOneBy({ id: questionPaperId });
+
+    if (!found) {
+      throw new NotFoundException(
+        `unable to find question paper with id:${questionPaperId}`,
+      );
+    }
+
+    return found;
   }
 
   async createQuestionPaper(

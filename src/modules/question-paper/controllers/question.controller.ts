@@ -12,8 +12,16 @@ export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
   @Get('/:questionId')
-  getQuestionById(@Param('questionId') questionId: string) {
-    return this.questionService.getQuestionById(questionId);
+  getQuestionById(
+    @Param('questionPaperId') questionPaperId: string,
+    @Param('questionId') questionId: string,
+    @GetUser() user: User,
+  ) {
+    return this.questionService.getQuestionById(
+      questionId,
+      questionPaperId,
+      user,
+    );
   }
 
   @Post('/new')
@@ -22,7 +30,7 @@ export class QuestionController {
     @Body() createQuestionDto: CreateQuestionDto,
     @GetUser() user: User,
   ) {
-    return this.questionService.createQuestionPaper(
+    return this.questionService.createQuestion(
       questionPaperId,
       createQuestionDto,
       user,
