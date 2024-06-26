@@ -1,15 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { Question } from '../../modules/question-paper/entites/question.entity';
+import {
+  Question,
+  QuestionType,
+} from '../../modules/question-paper/entites/question.entity';
 import { CreateQuestionDto } from '../../modules/question-paper/dto/question/create-question.dto';
 import { QuestionPaper } from '../../modules/question-paper/entites/question-paper.entity';
+import { TextAnswer } from '../../modules/question-paper/entites/answers/text/text-answer.entity';
 
 @Injectable()
 export class QuestionRepository extends Repository<Question> {
   constructor(private dataSource: DataSource) {
     super(Question, dataSource.createEntityManager());
   }
+
   async getQuestionById(questionId: string) {
     const found = await this.findOneBy({ id: questionId });
 
@@ -34,6 +43,23 @@ export class QuestionRepository extends Repository<Question> {
       parentQuestionPaper: questionPaper,
     });
 
+    return await this.save(question);
+  }
+
+  async bindAnswer({
+    question,
+    textAnswer,
+  }: {
+    question: Question;
+    textAnswer?: TextAnswer;
+  }) {
+    if (question.questionType === QuestionType.TEXT && textAnswer) {
+      question.textAnswer = textAnswer;
+    } else {
+      throw new BadRequestException('question type and answer mismatch');
+    }
+
+    question.answerAdded = true;
     return await this.save(question);
   }
 }
