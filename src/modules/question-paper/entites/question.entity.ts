@@ -22,7 +22,7 @@ export class Question {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'mediumtext' })
   questionText: string;
 
   @ManyToOne(() => QuestionPaper, (questionPaper) => questionPaper.questions)
@@ -30,6 +30,9 @@ export class Question {
 
   @Column({ type: 'enum', enum: QuestionType })
   questionType: QuestionType;
+
+  @Column({ default: false })
+  answerAdded: boolean;
 
   @OneToOne(() => McqAnswer)
   @JoinColumn()

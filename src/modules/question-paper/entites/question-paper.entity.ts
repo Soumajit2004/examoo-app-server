@@ -1,9 +1,10 @@
 import {
   Column,
   Entity,
-  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entites/user.entity';
@@ -17,9 +18,12 @@ export class QuestionPaper {
   @Column()
   name: string;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToOne(() => User, (user) => user.questionPapers, { eager: true })
   owner: User;
+
+  @ManyToMany(() => User, { eager: true })
+  @JoinTable()
+  candidates: User[];
 
   @Column({ default: new Date().toISOString() })
   createdOn: string;

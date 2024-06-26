@@ -14,6 +14,11 @@ import { McqResponse } from './entites/answers/mcq/mcq-response.entity';
 import { TextResponse } from './entites/answers/text/text-response.entity';
 import { NumericalResponse } from './entites/answers/numerical/numerical-response.entity';
 import { QuestionPaper } from './entites/question-paper.entity';
+import { QuestionPaperRepository } from '../../database/repositories/question-paper.repository';
+import { QuestionRepository } from '../../database/repositories/question.repository';
+import { AuthModule } from '../auth/auth.module';
+import { AnswerController } from './controllers/answer.controller';
+import { QuestionPaperAccessControlService } from './services/question-paper-access-control.service';
 
 @Module({
   imports: [
@@ -28,8 +33,15 @@ import { QuestionPaper } from './entites/question-paper.entity';
       NumericalAnswer,
       NumericalResponse,
     ]),
+    AuthModule,
   ],
-  providers: [QuestionPaperService, QuestionService],
-  controllers: [QuestionPaperController, QuestionController],
+  providers: [
+    QuestionPaperService,
+    QuestionService,
+    QuestionPaperRepository,
+    QuestionRepository,
+    QuestionPaperAccessControlService,
+  ],
+  controllers: [QuestionPaperController, QuestionController, AnswerController],
 })
 export class QuestionPaperModule {}
