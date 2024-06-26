@@ -21,7 +21,7 @@ export class QuestionPaper {
   @ManyToOne(() => User, (user) => user.questionPapers, { eager: true })
   owner: User;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, { eager: true })
   @JoinTable()
   candidates: User[];
 

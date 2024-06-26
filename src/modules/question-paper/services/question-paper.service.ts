@@ -1,73 +1,31 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { QuestionPaperRepository } from '../../../database/repositories/question-paper.repository';
 import { CreateQuestionPaperDto } from '../dto/question-paper/create-question-paper.dto';
 import { User } from '../../user/entites/user.entity';
 import { QuestionPaper } from '../entites/question-paper.entity';
 import { UpdateQuestionPaperDto } from '../dto/question-paper/update-question-paper.dto';
+import { QuestionPaperAccessControlService } from './question-paper-access-control.service';
 
 @Injectable()
 export class QuestionPaperService {
   constructor(
     private readonly questionPaperRepository: QuestionPaperRepository,
+    private readonly questionPaperAccessControlService: QuestionPaperAccessControlService,
   ) {}
-
-  async verifyReadAccess(
-    questionPaperId: string,
-    user: User,
-  ): Promise<boolean> {
-    const questionPaper = await this.questionPaperRepository.findOneBy({
-      id: questionPaperId,
-    });
-
-    const found = questionPaper.candidates.find((u) => {
-      return u.id === user.id;
-    });
-
-    if (!found) {
-      throw new ForbiddenException(
-        `no read access to question paper with id:${questionPaperId}`,
-      );
-    }
-
-    return !!found;
-  }
-
-  async verifyOwnerAccess(
-    questionPaperId: string,
-    user: User,
-  ): Promise<boolean> {
-    const hasAccess = await this.questionPaperRepository.findOneBy({
-      id: questionPaperId,
-      owner: user,
-    });
-
-    if (!hasAccess) {
-      throw new ForbiddenException(
-        `no owner access to question paper with id:${questionPaperId}`,
-      );
-    }
-
-    return !!hasAccess;
-  }
-
   async getQuestionPaperById(
     questionPaperId: string,
     user: User,
   ): Promise<QuestionPaper> {
-    const hasAccess = await this.verifyReadAccess(questionPaperId, user);
+    const questionPaper =
+      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
 
-    if (!hasAccess) {
-      throw new ForbiddenException(
-        `no read access to question paper with id: ${questionPaperId}`,
-      );
-    }
+    await this.questionPaperAccessControlService.verifyReadAccessOrFail(
+      questionPaper,
+      user,
+    );
 
-    return this.questionPaperRepository.getQuestionPaperById(questionPaperId);
+    return questionPaper;
   }
 
   async createQuestionPaper(
@@ -85,12 +43,15 @@ export class QuestionPaperService {
     updateQuestionPaperDto: UpdateQuestionPaperDto,
     user: User,
   ): Promise<QuestionPaper> {
-    await this.verifyOwnerAccess(questionPaperId, user);
-
     const { name } = updateQuestionPaperDto;
 
     const questionPaper =
       await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
+
+    await this.questionPaperAccessControlService.verifyOwnerAccessOrFail(
+      questionPaper,
+      user,
+    );
 
     if (name) {
       questionPaper.name = name;

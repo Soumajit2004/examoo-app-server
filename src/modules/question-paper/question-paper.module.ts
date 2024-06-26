@@ -18,6 +18,7 @@ import { QuestionPaperRepository } from '../../database/repositories/question-pa
 import { QuestionRepository } from '../../database/repositories/question.repository';
 import { AuthModule } from '../auth/auth.module';
 import { AnswerController } from './controllers/answer.controller';
+import { QuestionPaperAccessControlService } from './services/question-paper-access-control.service';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AnswerController } from './controllers/answer.controller';
     QuestionService,
     QuestionPaperRepository,
     QuestionRepository,
+    QuestionPaperAccessControlService,
   ],
   controllers: [QuestionPaperController, QuestionController, AnswerController],
 })
