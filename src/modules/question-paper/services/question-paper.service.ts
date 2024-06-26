@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 
 import { QuestionPaperRepository } from '../../../database/repositories/question-paper.repository';
-import { CreateQuestionPaperDto } from '../dto/create-question-paper.dto';
+import { CreateQuestionPaperDto } from '../dto/question-paper/create-question-paper.dto';
 import { User } from '../../user/entites/user.entity';
 import { QuestionPaper } from '../entites/question-paper.entity';
-import { UpdateQuestionPaperDto } from '../dto/update-question-paper.dto';
+import { UpdateQuestionPaperDto } from '../dto/question-paper/update-question-paper.dto';
 
 @Injectable()
 export class QuestionPaperService {

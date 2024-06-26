@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
 import { QuestionPaper } from '../../modules/question-paper/entites/question-paper.entity';
-import { CreateQuestionPaperDto } from '../../modules/question-paper/dto/create-question-paper.dto';
+import { CreateQuestionPaperDto } from '../../modules/question-paper/dto/question-paper/create-question-paper.dto';
 import { User } from '../../modules/user/entites/user.entity';
 
 @Injectable()

@@ -31,6 +31,9 @@ export class Question {
   @Column({ type: 'enum', enum: QuestionType })
   questionType: QuestionType;
 
+  @Column({ default: false })
+  answerAdded: boolean;
+
   @OneToOne(() => McqAnswer)
   @JoinColumn()
   mcqAnswer: McqAnswer;
