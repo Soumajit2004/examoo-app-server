@@ -1,15 +1,6 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { McqAnswer } from './answers/mcq/mcq-answer.entity';
-import { TextAnswer } from './answers/text/text-answer.entity';
-import { NumericalAnswer } from './answers/numerical/numerical-answer.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { QuestionPaper } from './question-paper.entity';
+import { Exclude } from 'class-transformer';
 
 export enum QuestionType {
   MCQ = 'mcq',
@@ -26,6 +17,7 @@ export class Question {
   questionText: string;
 
   @ManyToOne(() => QuestionPaper, (questionPaper) => questionPaper.questions)
+  @Exclude({ toPlainOnly: true })
   parentQuestionPaper: QuestionPaper;
 
   @Column({ type: 'enum', enum: QuestionType })
@@ -33,16 +25,4 @@ export class Question {
 
   @Column({ default: false })
   answerAdded: boolean;
-
-  @OneToOne(() => McqAnswer)
-  @JoinColumn()
-  mcqAnswer: McqAnswer;
-
-  @OneToOne(() => TextAnswer)
-  @JoinColumn()
-  textAnswer: TextAnswer;
-
-  @OneToOne(() => NumericalAnswer)
-  @JoinColumn()
-  numericalAnswer: NumericalAnswer;
 }

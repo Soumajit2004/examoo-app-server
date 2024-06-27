@@ -16,9 +16,13 @@ export class QuestionPaperAccessControlService {
     });
 
     if (!found) {
-      throw new ForbiddenException(
-        `no read access to question paper with id:${questionPaper.id}`,
-      );
+      try {
+        found = await this.verifyOwnerAccessOrFail(questionPaper, user);
+      } catch (e) {
+        throw new ForbiddenException(
+          `no read access to question paper with id:${questionPaper.id}`,
+        );
+      }
     }
 
     return !!found;

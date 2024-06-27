@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
-import { ExamModule } from './modules/exam/exam.module';
 
 import { configValidationSchema } from './config.schema';
 import { QuestionPaperModule } from './modules/question-paper/question-paper.module';
@@ -34,7 +33,6 @@ import { QuestionPaperModule } from './modules/question-paper/question-paper.mod
     }),
     AuthModule,
     UserModule,
-    ExamModule,
     QuestionPaperModule,
   ],
 })

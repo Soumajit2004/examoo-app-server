@@ -11,7 +11,6 @@ import {
 } from '../../modules/question-paper/entites/question.entity';
 import { CreateQuestionDto } from '../../modules/question-paper/dto/question/create-question.dto';
 import { QuestionPaper } from '../../modules/question-paper/entites/question-paper.entity';
-import { TextAnswer } from '../../modules/question-paper/entites/answers/text/text-answer.entity';
 
 @Injectable()
 export class QuestionRepository extends Repository<Question> {
@@ -43,23 +42,6 @@ export class QuestionRepository extends Repository<Question> {
       parentQuestionPaper: questionPaper,
     });
 
-    return await this.save(question);
-  }
-
-  async bindAnswer({
-    question,
-    textAnswer,
-  }: {
-    question: Question;
-    textAnswer?: TextAnswer;
-  }) {
-    if (question.questionType === QuestionType.TEXT && textAnswer) {
-      question.textAnswer = textAnswer;
-    } else {
-      throw new BadRequestException('question type and answer mismatch');
-    }
-
-    question.answerAdded = true;
     return await this.save(question);
   }
 }
