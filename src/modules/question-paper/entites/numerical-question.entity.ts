@@ -26,7 +26,7 @@ export class NumericalQuestion {
   @Column({ default: false })
   answerAdded: boolean;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   @Exclude({ toPlainOnly: true })
-  answer: number;
+  answer?: number;
 }

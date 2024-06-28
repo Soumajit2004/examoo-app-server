@@ -5,10 +5,7 @@ import { QuestionPaper } from '../entites/question-paper.entity';
 
 @Injectable()
 export class QuestionPaperAccessControlService {
-  async verifyReadAccessOrFail(
-    questionPaper: QuestionPaper,
-    user: User,
-  ): Promise<boolean> {
+  verifyReadAccessOrFail(questionPaper: QuestionPaper, user: User): boolean {
     let found = false;
 
     questionPaper.candidates.forEach((u) => {
@@ -17,7 +14,7 @@ export class QuestionPaperAccessControlService {
 
     if (!found) {
       try {
-        found = await this.verifyOwnerAccessOrFail(questionPaper, user);
+        found = this.verifyOwnerAccessOrFail(questionPaper, user);
       } catch (e) {
         throw new ForbiddenException(
           `no read access to question paper with id:${questionPaper.id}`,
@@ -28,10 +25,7 @@ export class QuestionPaperAccessControlService {
     return !!found;
   }
 
-  async verifyOwnerAccessOrFail(
-    questionPaper: QuestionPaper,
-    user: User,
-  ): Promise<boolean> {
+  verifyOwnerAccessOrFail(questionPaper: QuestionPaper, user: User): boolean {
     if (questionPaper.owner.id === user.id) {
       return true;
     }

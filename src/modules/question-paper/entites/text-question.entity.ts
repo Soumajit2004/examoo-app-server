@@ -26,7 +26,7 @@ export class TextQuestion {
   @Column({ default: false })
   answerAdded: boolean;
 
-  @Column({ type: 'mediumtext' })
+  @Column({ type: 'mediumtext', nullable: true })
   @Exclude({ toPlainOnly: true })
-  answer: string;
+  answer?: string;
 }

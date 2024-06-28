@@ -15,6 +15,7 @@ import { McqOption } from './entites/mcq-option.entity';
 import { NumericalQuestion } from './entites/numerical-question.entity';
 import { TextQuestion } from './entites/text-question.entity';
 import { NumericalQuestionRepository } from '../../database/repositories/numerical-question.repository';
+import { TextQuestionRepository } from '../../database/repositories/text-question.repository';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { NumericalQuestionRepository } from '../../database/repositories/numeric
     QuestionPaperRepository,
     McqQuestionRepository,
     NumericalQuestionRepository,
+    TextQuestionRepository,
     QuestionPaperAccessControlService,
   ],
   controllers: [QuestionPaperController, QuestionController],
