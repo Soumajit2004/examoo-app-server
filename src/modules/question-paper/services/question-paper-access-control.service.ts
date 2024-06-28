@@ -1,37 +1,36 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { User } from '../../user/entites/user.entity';
-import { QuestionPaper } from '../entites/question-paper.entity';
+import { QuestionPaperRepository } from '../../../database/repositories/question-paper.repository';
 
 @Injectable()
 export class QuestionPaperAccessControlService {
-  verifyReadAccessOrFail(questionPaper: QuestionPaper, user: User): boolean {
+  constructor(
+    private readonly questionPaperRepository: QuestionPaperRepository,
+  ) {}
+  async verifyReadAccessOrFail(
+    questionPaperId: string,
+    user: User,
+  ): Promise<boolean> {
+    const questionPaper =
+      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
+
     let found = false;
 
     questionPaper.candidates.forEach((u) => {
       u.id === user.id ? (found = true) : null;
     });
 
-    if (!found) {
-      try {
-        found = this.verifyOwnerAccessOrFail(questionPaper, user);
-      } catch (e) {
-        throw new ForbiddenException(
-          `no read access to question paper with id:${questionPaper.id}`,
-        );
-      }
-    }
-
     return !!found;
   }
 
-  verifyOwnerAccessOrFail(questionPaper: QuestionPaper, user: User): boolean {
-    if (questionPaper.owner.id === user.id) {
-      return true;
-    }
+  async verifyOwnerAccessOrFail(
+    questionPaperId: string,
+    user: User,
+  ): Promise<boolean> {
+    const questionPaper =
+      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
 
-    throw new ForbiddenException(
-      `no owner access to question paper with id:${questionPaper.id}`,
-    );
+    return questionPaper.owner.id === user.id;
   }
 }
