@@ -8,7 +8,14 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entites/user.entity';
-import { Question } from './question.entity';
+import { McqQuestion } from './mcq-question.entity';
+import { TextQuestion } from './text-question.entity';
+import { NumericalQuestion } from './numerical-question.entity';
+export enum QuestionType {
+  MCQ = 'mcq',
+  TEXT = 'text',
+  NUMERICAL = 'numerical',
+}
 
 @Entity()
 export class QuestionPaper {
@@ -28,8 +35,30 @@ export class QuestionPaper {
   @Column({ default: new Date().toISOString() })
   createdOn: string;
 
-  @OneToMany(() => Question, (question) => question.parentQuestionPaper, {
-    eager: true,
-  })
-  questions: Question[];
+  @OneToMany(
+    () => McqQuestion,
+    (mcqQuestion) => mcqQuestion.parentQuestionPaper,
+    {
+      eager: true,
+    },
+  )
+  mcqQuestions: McqQuestion[];
+
+  @OneToMany(
+    () => NumericalQuestion,
+    (numericalQuestion) => numericalQuestion.parentQuestionPaper,
+    {
+      eager: true,
+    },
+  )
+  numericalQuestions: NumericalQuestion[];
+
+  @OneToMany(
+    () => TextQuestion,
+    (textQuestion) => textQuestion.parentQuestionPaper,
+    {
+      eager: true,
+    },
+  )
+  textQuestions: TextQuestion[];
 }
