@@ -17,6 +17,7 @@ import { McqQuestion } from '../entites/mcq-question.entity';
 import { NumericalQuestion } from '../entites/numerical-question.entity';
 import { TextQuestion } from '../entites/text-question.entity';
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
+import { AddAnswerDto } from '../dto/question/add-answer.dto';
 
 @Controller('question-paper/:questionPaperId/question')
 @UseGuards(AuthGuard())
@@ -56,10 +57,25 @@ export class QuestionController {
     @Body() addMcqOptionDto: AddMcqOptionDto,
     @GetUser() user: User,
   ): Promise<McqQuestion> {
-    return await this.questionService.addMcqOption(
+    return this.questionService.addMcqOption(
       questionPaperId,
       questionId,
       addMcqOptionDto,
+      user,
+    );
+  }
+
+  @Patch(':questionId/answer')
+  async addAnswer(
+    @Param('questionPaperId') questionPaperId: string,
+    @Param('questionId') questionId: string,
+    @Body() addAnswerDto: AddAnswerDto,
+    @GetUser() user: User,
+  ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
+    return this.questionService.addAnswer(
+      questionPaperId,
+      questionId,
+      addAnswerDto,
       user,
     );
   }

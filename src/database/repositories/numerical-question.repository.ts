@@ -25,4 +25,10 @@ export class NumericalQuestionRepository extends Repository<NumericalQuestion> {
 
     return await this.save(question);
   }
+  async addAnswer(numericalQuestion: NumericalQuestion, correctAnswer: number) {
+    numericalQuestion.answerAdded = true;
+    numericalQuestion.answer = correctAnswer;
+
+    return await this.save(numericalQuestion);
+  }
 }

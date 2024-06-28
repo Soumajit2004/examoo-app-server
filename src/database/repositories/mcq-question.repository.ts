@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
 import { McqQuestion } from '../../modules/question-paper/entites/mcq-question.entity';
@@ -46,6 +46,27 @@ export class McqQuestionRepository extends Repository<McqQuestion> {
     mcqQuestion.mcqOptions = [option, ...mcqQuestion.mcqOptions];
 
     await this.mcqOptionRepository.save(option);
+
+    return await this.save(mcqQuestion);
+  }
+
+  async addAnswer(mcqQuestion: McqQuestion, correctOption: McqOption) {
+    let includesInOption = false;
+
+    mcqQuestion.mcqOptions.forEach((option) => {
+      if (option.id === correctOption.id) {
+        includesInOption = true;
+      }
+    });
+
+    if (!includesInOption) {
+      throw new BadRequestException(
+        `${mcqQuestion.id} does not include option ${correctOption.id} `,
+      );
+    }
+
+    mcqQuestion.answerAdded = true;
+    mcqQuestion.answer = correctOption.id;
 
     return await this.save(mcqQuestion);
   }

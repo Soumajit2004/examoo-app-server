@@ -16,6 +16,10 @@ import { NumericalQuestion } from '../entites/numerical-question.entity';
 import { TextQuestionRepository } from '../../../database/repositories/text-question.repository';
 import { TextQuestion } from '../entites/text-question.entity';
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
+import { AddAnswerDto } from '../dto/question/add-answer.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { McqOption } from '../entites/mcq-option.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class QuestionService {
@@ -25,6 +29,8 @@ export class QuestionService {
     private readonly textQuestionRepository: TextQuestionRepository,
     private readonly questionPaperRepository: QuestionPaperRepository,
     private readonly questionPaperAccessControlService: QuestionPaperAccessControlService,
+    @InjectRepository(McqOption)
+    private mcqOptionRepository: Repository<McqOption>,
   ) {}
 
   async getQuestionById(
@@ -115,5 +121,34 @@ export class QuestionService {
     }
 
     throw new BadRequestException(`invalid question type`);
+  }
+
+  async addAnswer(
+    questionPaperId: string,
+    questionId: string,
+    addAnswerDto: AddAnswerDto,
+    user: User,
+  ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
+    const question = await this.getQuestionById(
+      questionId,
+      questionPaperId,
+      user,
+    );
+
+    if (question instanceof McqQuestion && addAnswerDto.mcqOptionId) {
+      const option = await this.mcqOptionRepository.findOneOrFail({
+        where: { id: addAnswerDto.mcqOptionId },
+      });
+
+      return this.mcqQuestionRepository.addAnswer(question, option);
+    } else if (
+      question instanceof NumericalQuestion &&
+      addAnswerDto.numericalAnswer
+    ) {
+      return this.numericalQuestionRepository.addAnswer(
+        question,
+        addAnswerDto.numericalAnswer,
+      );
+    }
   }
 }

@@ -1,10 +1,8 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
@@ -36,10 +34,9 @@ export class McqQuestion {
   @Column({ default: false })
   answerAdded: boolean;
 
-  @OneToOne(() => McqQuestion)
-  @JoinColumn()
+  @Column({ nullable: true })
   @Exclude({ toPlainOnly: true })
-  answer: McqOption;
+  answer: string;
 
   @OneToMany(() => McqOption, (mcqOption) => mcqOption.parentMcqQuestion, {
     eager: true,
