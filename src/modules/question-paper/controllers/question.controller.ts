@@ -69,7 +69,7 @@ export class QuestionController {
     }
 
     throw new ForbiddenException(
-      `no create privileges to question paper with id:${questionPaperId}`,
+      `no owner privileges to question paper with id:${questionPaperId}`,
     );
   }
 
@@ -90,7 +90,7 @@ export class QuestionController {
     }
 
     throw new ForbiddenException(
-      `no update privileges to question paper with id:${questionPaperId}`,
+      `no owner privileges to question paper with id:${questionPaperId}`,
     );
   }
 
@@ -111,7 +111,7 @@ export class QuestionController {
     }
 
     throw new ForbiddenException(
-      `no update privileges to question paper with id:${questionPaperId}`,
+      `no owner privileges to question paper with id:${questionPaperId}`,
     );
   }
 
@@ -132,7 +132,7 @@ export class QuestionController {
     }
 
     throw new ForbiddenException(
-      `no update privileges to question paper with id:${questionPaperId}`,
+      `no owner privileges to question paper with id:${questionPaperId}`,
     );
   }
 }

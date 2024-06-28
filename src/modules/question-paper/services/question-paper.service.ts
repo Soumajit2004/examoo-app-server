@@ -5,27 +5,36 @@ import { CreateQuestionPaperDto } from '../dto/question-paper/create-question-pa
 import { User } from '../../user/entites/user.entity';
 import { QuestionPaper } from '../entites/question-paper.entity';
 import { UpdateQuestionPaperDto } from '../dto/question-paper/update-question-paper.dto';
-import { QuestionPaperAccessControlService } from './question-paper-access-control.service';
+import { QuestionPaperResponseDto } from '../dto/question-paper/response-question-paper.dto';
 
 @Injectable()
 export class QuestionPaperService {
   constructor(
     private readonly questionPaperRepository: QuestionPaperRepository,
-    private readonly questionPaperAccessControlService: QuestionPaperAccessControlService,
   ) {}
+
   async getQuestionPaperById(
     questionPaperId: string,
-    user: User,
-  ): Promise<QuestionPaper> {
-    const questionPaper =
+  ): Promise<QuestionPaperResponseDto> {
+    const {
+      id,
+      name,
+      owner,
+      createdOn,
+      candidates,
+      textQuestions,
+      mcqQuestions,
+      numericalQuestions,
+    } =
       await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
-
-    await this.questionPaperAccessControlService.verifyReadAccessOrFail(
-      questionPaper,
-      user,
-    );
-
-    return questionPaper;
+    return {
+      id,
+      name,
+      owner,
+      createdOn,
+      candidates,
+      questions: [...textQuestions, ...mcqQuestions, ...numericalQuestions],
+    };
   }
 
   async createQuestionPaper(
@@ -41,17 +50,11 @@ export class QuestionPaperService {
   async updateQuestionPaper(
     questionPaperId: string,
     updateQuestionPaperDto: UpdateQuestionPaperDto,
-    user: User,
   ): Promise<QuestionPaper> {
     const { name } = updateQuestionPaperDto;
 
     const questionPaper =
       await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
-
-    await this.questionPaperAccessControlService.verifyOwnerAccessOrFail(
-      questionPaper,
-      user,
-    );
 
     if (name) {
       questionPaper.name = name;

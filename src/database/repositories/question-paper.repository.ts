@@ -31,6 +31,7 @@ export class QuestionPaperRepository extends Repository<QuestionPaper> {
     const questionPaper = this.create({
       name,
       owner: user,
+      candidates: [user],
     });
 
     return await this.save(questionPaper);
