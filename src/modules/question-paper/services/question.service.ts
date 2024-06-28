@@ -149,6 +149,13 @@ export class QuestionService {
         question,
         addAnswerDto.numericalAnswer,
       );
+    } else if (question instanceof TextQuestion && addAnswerDto.textAnswer) {
+      return this.textQuestionRepository.addAnswer(
+        question,
+        addAnswerDto.textAnswer,
+      );
+    } else {
+      throw new BadRequestException('question type and answer mismatch');
     }
   }
 }

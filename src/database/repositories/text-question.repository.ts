@@ -25,4 +25,11 @@ export class TextQuestionRepository extends Repository<TextQuestion> {
 
     return await this.save(question);
   }
+
+  async addAnswer(textQuestion: TextQuestion, correctAnswer: string) {
+    textQuestion.answerAdded = true;
+    textQuestion.answer = correctAnswer;
+
+    return await this.save(textQuestion);
+  }
 }
