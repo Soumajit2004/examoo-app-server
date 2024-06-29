@@ -21,6 +21,9 @@ export class QuestionPaperRepository extends Repository<QuestionPaper> {
     const questionPaper = this.create({
       name,
       owner: user,
+      mcqQuestions: [],
+      textQuestions: [],
+      numericalQuestions: [],
     });
 
     return await this.save(questionPaper);

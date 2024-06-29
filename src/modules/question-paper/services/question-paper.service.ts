@@ -75,4 +75,16 @@ export class QuestionPaperService {
       updateQuestionPaperDto,
     );
   }
+
+  async deleteQuestionPaper(
+    questionPaperId: string,
+    user: User,
+  ): Promise<void> {
+    const questionPaper = await this.getQuestionPaperById(
+      questionPaperId,
+      user,
+    );
+
+    await this.questionPaperRepository.remove(questionPaper);
+  }
 }

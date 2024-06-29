@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -62,6 +63,19 @@ export class QuestionController {
       questionPaperId,
       questionId,
       updateQuestionDto,
+      user,
+    );
+  }
+
+  @Delete('/:questionId')
+  async deleteQuestion(
+    @Param('questionPaperId') questionPaperId: string,
+    @Param('questionId') questionId: string,
+    @GetUser() user: User,
+  ) {
+    return this.questionService.deleteQuestion(
+      questionPaperId,
+      questionId,
       user,
     );
   }

@@ -119,6 +119,26 @@ export class QuestionService {
     throw new BadRequestException('invalid question type');
   }
 
+  async deleteQuestion(
+    questionPaperId: string,
+    questionId: string,
+    user: User,
+  ) {
+    const question = await this.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
+    );
+
+    if (question instanceof McqQuestion) {
+      await this.mcqQuestionRepository.remove(question);
+    } else if (question instanceof TextQuestion) {
+      await this.textQuestionRepository.remove(question);
+    } else if (question instanceof NumericalQuestion) {
+      await this.numericalQuestionRepository.remove(question);
+    }
+  }
+
   async addAnswer(
     questionPaperId: string,
     questionId: string,
