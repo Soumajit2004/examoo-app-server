@@ -10,7 +10,6 @@ import { QuestionPaper } from './entites/question-paper.entity';
 import { QuestionPaperRepository } from '../../database/repositories/question-paper.repository';
 import { McqQuestionRepository } from '../../database/repositories/mcq-question.repository';
 import { AuthModule } from '../auth/auth.module';
-import { QuestionPaperAccessControlService } from './services/question-paper-access-control.service';
 import { McqOption } from './entites/mcq-option.entity';
 import { NumericalQuestion } from './entites/numerical-question.entity';
 import { TextQuestion } from './entites/text-question.entity';
@@ -35,7 +34,6 @@ import { TextQuestionRepository } from '../../database/repositories/text-questio
     McqQuestionRepository,
     NumericalQuestionRepository,
     TextQuestionRepository,
-    QuestionPaperAccessControlService,
   ],
   controllers: [QuestionPaperController, QuestionController],
 })

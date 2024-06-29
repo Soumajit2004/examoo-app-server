@@ -4,10 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { User } from '../../user/entites/user.entity';
 import { McqQuestionRepository } from '../../../database/repositories/mcq-question.repository';
-import { QuestionPaperRepository } from '../../../database/repositories/question-paper.repository';
-import { QuestionPaperAccessControlService } from './question-paper-access-control.service';
 import { McqQuestion } from '../entites/mcq-question.entity';
 import { CreateQuestionDto } from '../dto/question/create-question.dto';
 import { QuestionType } from '../entites/question-paper.entity';
@@ -20,6 +17,9 @@ import { AddAnswerDto } from '../dto/question/add-answer.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { McqOption } from '../entites/mcq-option.entity';
 import { Repository } from 'typeorm';
+import { UpdateQuestionDto } from '../dto/question/update-question.dto';
+import { QuestionPaperService } from './question-paper.service';
+import { User } from '../../user/entites/user.entity';
 
 @Injectable()
 export class QuestionService {
@@ -27,36 +27,33 @@ export class QuestionService {
     private readonly mcqQuestionRepository: McqQuestionRepository,
     private readonly numericalQuestionRepository: NumericalQuestionRepository,
     private readonly textQuestionRepository: TextQuestionRepository,
-    private readonly questionPaperRepository: QuestionPaperRepository,
-    private readonly questionPaperAccessControlService: QuestionPaperAccessControlService,
     @InjectRepository(McqOption)
     private mcqOptionRepository: Repository<McqOption>,
+    private readonly questionPaperService: QuestionPaperService,
   ) {}
 
   async getQuestionById(
-    questionId: string,
     questionPaperId: string,
+    questionId: string,
     user: User,
   ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
-    this.questionPaperAccessControlService.verifyReadAccessOrFail(
-      await this.questionPaperRepository.getQuestionPaperById(questionPaperId),
+    const questionPaper = await this.questionPaperService.getQuestionPaperById(
+      questionPaperId,
       user,
     );
 
-    let found: McqQuestion | TextQuestion | NumericalQuestion;
-
-    for (const repository of [
-      this.mcqQuestionRepository,
-      this.numericalQuestionRepository,
-      this.textQuestionRepository,
-    ]) {
-      found = await repository.findOneBy({
-        id: questionId,
-      });
-
-      if (found) {
-        return found;
+    const filter = [
+      ...questionPaper.numericalQuestions,
+      ...questionPaper.textQuestions,
+      ...questionPaper.mcqQuestions,
+    ].filter((q) => {
+      if (q.id === questionId) {
+        return q;
       }
+    });
+
+    if (filter.length > 0) {
+      return filter[0];
     }
 
     throw new NotFoundException(
@@ -69,11 +66,8 @@ export class QuestionService {
     createQuestionDto: CreateQuestionDto,
     user: User,
   ): Promise<McqQuestion | NumericalQuestion | TextQuestion> {
-    const questionPaper =
-      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
-
-    this.questionPaperAccessControlService.verifyOwnerAccessOrFail(
-      questionPaper,
+    const questionPaper = await this.questionPaperService.getQuestionPaperById(
+      questionPaperId,
       user,
     );
 
@@ -98,29 +92,51 @@ export class QuestionService {
     }
   }
 
-  async addMcqOption(
+  async updateQuestion(
     questionPaperId: string,
     questionId: string,
-    addMcqOptionDto: AddMcqOptionDto,
+    updateQuestionDto: UpdateQuestionDto,
     user: User,
-  ): Promise<McqQuestion> {
-    const mcqQuestion = await this.getQuestionById(
-      questionId,
+  ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
+    const { questionText } = updateQuestionDto;
+
+    const question = await this.getQuestionById(
       questionPaperId,
+      questionId,
       user,
     );
 
-    if (
-      mcqQuestion instanceof McqQuestion &&
-      mcqQuestion.questionType === QuestionType.MCQ
-    ) {
-      return this.mcqQuestionRepository.addMcqOption(
-        mcqQuestion,
-        addMcqOptionDto,
-      );
+    question.questionText = questionText;
+
+    if (question instanceof McqQuestion) {
+      return await this.mcqQuestionRepository.save(question);
+    } else if (question instanceof TextQuestion) {
+      return await this.textQuestionRepository.save(question);
+    } else if (question instanceof NumericalQuestion) {
+      return await this.numericalQuestionRepository.save(question);
     }
 
-    throw new BadRequestException(`invalid question type`);
+    throw new BadRequestException('invalid question type');
+  }
+
+  async deleteQuestion(
+    questionPaperId: string,
+    questionId: string,
+    user: User,
+  ) {
+    const question = await this.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
+    );
+
+    if (question instanceof McqQuestion) {
+      await this.mcqQuestionRepository.remove(question);
+    } else if (question instanceof TextQuestion) {
+      await this.textQuestionRepository.remove(question);
+    } else if (question instanceof NumericalQuestion) {
+      await this.numericalQuestionRepository.remove(question);
+    }
   }
 
   async addAnswer(
@@ -130,8 +146,8 @@ export class QuestionService {
     user: User,
   ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
     const question = await this.getQuestionById(
-      questionId,
       questionPaperId,
+      questionId,
       user,
     );
 
@@ -154,8 +170,46 @@ export class QuestionService {
         question,
         addAnswerDto.textAnswer,
       );
-    } else {
-      throw new BadRequestException('question type and answer mismatch');
     }
+
+    throw new BadRequestException('question type and answer mismatch');
+  }
+
+  async removeAnswer(questionPaperId: string, questionId: string, user: User) {
+    const question = await this.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
+    );
+
+    if (question instanceof McqQuestion) {
+      await this.mcqQuestionRepository.removeAnswer(question);
+    } else if (question instanceof NumericalQuestion) {
+      await this.numericalQuestionRepository.removeAnswer(question);
+    } else if (question instanceof TextQuestion) {
+      await this.textQuestionRepository.removeAnswer(question);
+    }
+  }
+
+  async addMcqOption(
+    questionPaperId: string,
+    questionId: string,
+    addMcqOptionDto: AddMcqOptionDto,
+    user: User,
+  ): Promise<McqQuestion> {
+    const question = await this.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
+    );
+
+    if (
+      question instanceof McqQuestion &&
+      question.questionType === QuestionType.MCQ
+    ) {
+      return this.mcqQuestionRepository.addMcqOption(question, addMcqOptionDto);
+    }
+
+    throw new BadRequestException(`question must be of mmq type`);
   }
 }

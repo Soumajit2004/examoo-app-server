@@ -70,4 +70,11 @@ export class McqQuestionRepository extends Repository<McqQuestion> {
 
     return await this.save(mcqQuestion);
   }
+
+  async removeAnswer(mcqQuestion: McqQuestion) {
+    mcqQuestion.answerAdded = false;
+    mcqQuestion.answer = null;
+
+    return await this.save(mcqQuestion);
+  }
 }

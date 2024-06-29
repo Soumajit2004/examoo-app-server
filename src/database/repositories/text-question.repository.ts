@@ -32,4 +32,11 @@ export class TextQuestionRepository extends Repository<TextQuestion> {
 
     return await this.save(textQuestion);
   }
+
+  async removeAnswer(textQuestion: TextQuestion) {
+    textQuestion.answerAdded = false;
+    textQuestion.answer = null;
+
+    return await this.save(textQuestion);
+  }
 }

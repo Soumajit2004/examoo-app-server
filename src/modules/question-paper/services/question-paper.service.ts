@@ -1,31 +1,53 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { QuestionPaperRepository } from '../../../database/repositories/question-paper.repository';
 import { CreateQuestionPaperDto } from '../dto/question-paper/create-question-paper.dto';
 import { User } from '../../user/entites/user.entity';
 import { QuestionPaper } from '../entites/question-paper.entity';
 import { UpdateQuestionPaperDto } from '../dto/question-paper/update-question-paper.dto';
-import { QuestionPaperAccessControlService } from './question-paper-access-control.service';
+import { QuestionPaperResponseDto } from '../dto/question-paper/response-question-paper.dto';
 
 @Injectable()
 export class QuestionPaperService {
   constructor(
     private readonly questionPaperRepository: QuestionPaperRepository,
-    private readonly questionPaperAccessControlService: QuestionPaperAccessControlService,
   ) {}
+
+  formatQuestionPaperResponse(
+    questionPaper: QuestionPaper,
+  ): QuestionPaperResponseDto {
+    const response = {
+      ...questionPaper,
+      questions: [
+        ...questionPaper.mcqQuestions,
+        ...questionPaper.numericalQuestions,
+        ...questionPaper.textQuestions,
+      ],
+    };
+
+    delete response.textQuestions;
+    delete response.mcqQuestions;
+    delete response.numericalQuestions;
+
+    return response;
+  }
+
   async getQuestionPaperById(
     questionPaperId: string,
     user: User,
   ): Promise<QuestionPaper> {
-    const questionPaper =
-      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
+    const found = await this.questionPaperRepository.findOneBy({
+      id: questionPaperId,
+      owner: user,
+    });
 
-    await this.questionPaperAccessControlService.verifyReadAccessOrFail(
-      questionPaper,
-      user,
-    );
+    if (!found) {
+      throw new NotFoundException(
+        `question paper with id: ${questionPaperId} not found`,
+      );
+    }
 
-    return questionPaper;
+    return found;
   }
 
   async createQuestionPaper(
@@ -43,22 +65,26 @@ export class QuestionPaperService {
     updateQuestionPaperDto: UpdateQuestionPaperDto,
     user: User,
   ): Promise<QuestionPaper> {
-    const { name } = updateQuestionPaperDto;
-
-    const questionPaper =
-      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
-
-    await this.questionPaperAccessControlService.verifyOwnerAccessOrFail(
-      questionPaper,
+    const questionPaper = await this.getQuestionPaperById(
+      questionPaperId,
       user,
     );
 
-    if (name) {
-      questionPaper.name = name;
-    } else {
-      throw new BadRequestException('no change implemented');
-    }
+    return await this.questionPaperRepository.updateQuestionPaper(
+      questionPaper,
+      updateQuestionPaperDto,
+    );
+  }
 
-    return await this.questionPaperRepository.save(questionPaper);
+  async deleteQuestionPaper(
+    questionPaperId: string,
+    user: User,
+  ): Promise<void> {
+    const questionPaper = await this.getQuestionPaperById(
+      questionPaperId,
+      user,
+    );
+
+    await this.questionPaperRepository.remove(questionPaper);
   }
 }

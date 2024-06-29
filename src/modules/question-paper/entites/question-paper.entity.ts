@@ -1,8 +1,6 @@
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -11,6 +9,7 @@ import { User } from '../../user/entites/user.entity';
 import { McqQuestion } from './mcq-question.entity';
 import { TextQuestion } from './text-question.entity';
 import { NumericalQuestion } from './numerical-question.entity';
+
 export enum QuestionType {
   MCQ = 'mcq',
   TEXT = 'text',
@@ -28,10 +27,6 @@ export class QuestionPaper {
   @ManyToOne(() => User, (user) => user.questionPapers, { eager: true })
   owner: User;
 
-  @ManyToMany(() => User, { eager: true })
-  @JoinTable()
-  candidates: User[];
-
   @Column({ default: new Date().toISOString() })
   createdOn: string;
 
@@ -40,6 +35,7 @@ export class QuestionPaper {
     (mcqQuestion) => mcqQuestion.parentQuestionPaper,
     {
       eager: true,
+      onDelete: 'CASCADE',
     },
   )
   mcqQuestions: McqQuestion[];
@@ -49,6 +45,8 @@ export class QuestionPaper {
     (numericalQuestion) => numericalQuestion.parentQuestionPaper,
     {
       eager: true,
+      cascade: true,
+      onDelete: 'CASCADE',
     },
   )
   numericalQuestions: NumericalQuestion[];
@@ -58,6 +56,8 @@ export class QuestionPaper {
     (textQuestion) => textQuestion.parentQuestionPaper,
     {
       eager: true,
+      cascade: true,
+      onDelete: 'CASCADE',
     },
   )
   textQuestions: TextQuestion[];

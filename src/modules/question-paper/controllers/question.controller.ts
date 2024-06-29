@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -18,6 +19,7 @@ import { NumericalQuestion } from '../entites/numerical-question.entity';
 import { TextQuestion } from '../entites/text-question.entity';
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
 import { AddAnswerDto } from '../dto/question/add-answer.dto';
+import { UpdateQuestionDto } from '../dto/question/update-question.dto';
 
 @Controller('question-paper/:questionPaperId/question')
 @UseGuards(AuthGuard())
@@ -25,20 +27,20 @@ export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
   @Get('/:questionId')
-  getQuestionById(
+  async getQuestionById(
     @Param('questionPaperId') questionPaperId: string,
     @Param('questionId') questionId: string,
     @GetUser() user: User,
   ) {
     return this.questionService.getQuestionById(
-      questionId,
       questionPaperId,
+      questionId,
       user,
     );
   }
 
   @Post('/new')
-  createQuestion(
+  async createQuestion(
     @Param('questionPaperId') questionPaperId: string,
     @Body() createQuestionDto: CreateQuestionDto,
     @GetUser() user: User,
@@ -46,6 +48,34 @@ export class QuestionController {
     return this.questionService.createQuestion(
       questionPaperId,
       createQuestionDto,
+      user,
+    );
+  }
+
+  @Patch('/:questionId')
+  async updateQuestion(
+    @Param('questionPaperId') questionPaperId: string,
+    @Param('questionId') questionId: string,
+    @Body() updateQuestionDto: UpdateQuestionDto,
+    @GetUser() user: User,
+  ) {
+    return this.questionService.updateQuestion(
+      questionPaperId,
+      questionId,
+      updateQuestionDto,
+      user,
+    );
+  }
+
+  @Delete('/:questionId')
+  async deleteQuestion(
+    @Param('questionPaperId') questionPaperId: string,
+    @Param('questionId') questionId: string,
+    @GetUser() user: User,
+  ) {
+    return this.questionService.deleteQuestion(
+      questionPaperId,
+      questionId,
       user,
     );
   }
@@ -78,5 +108,14 @@ export class QuestionController {
       addAnswerDto,
       user,
     );
+  }
+
+  @Delete(':questionId/answer')
+  deleteAnswer(
+    @Param('questionPaperId') questionPaperId: string,
+    @Param('questionId') questionId: string,
+    @GetUser() user: User,
+  ) {
+    return this.questionService.removeAnswer(questionPaperId, questionId, user);
   }
 }

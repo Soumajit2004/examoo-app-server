@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 import { QuestionType } from '../../entites/question-paper.entity';
 
 export class CreateQuestionDto {
@@ -8,7 +8,4 @@ export class CreateQuestionDto {
   @IsEnum(QuestionType)
   @IsNotEmpty()
   questionType: QuestionType;
-
-  @IsOptional()
-  imageUrl?: string;
 }

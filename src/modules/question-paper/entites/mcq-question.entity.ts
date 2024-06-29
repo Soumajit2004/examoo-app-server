@@ -24,7 +24,11 @@ export class McqQuestion {
   @Column({ type: 'mediumtext' })
   questionText: string;
 
-  @ManyToOne(() => QuestionPaper, (questionPaper) => questionPaper.mcqQuestions)
+  @ManyToOne(
+    () => QuestionPaper,
+    (questionPaper) => questionPaper.mcqQuestions,
+    { onDelete: 'CASCADE' },
+  )
   @Exclude({ toPlainOnly: true })
   parentQuestionPaper: QuestionPaper;
 
@@ -40,6 +44,7 @@ export class McqQuestion {
 
   @OneToMany(() => McqOption, (mcqOption) => mcqOption.parentMcqQuestion, {
     eager: true,
+    onDelete: 'CASCADE',
   })
   mcqOptions: McqOption[];
 }

@@ -16,7 +16,11 @@ export class TextQuestion {
   @Column({ type: 'mediumtext' })
   questionText: string;
 
-  @ManyToOne(() => QuestionPaper, (questionPaper) => questionPaper.mcqQuestions)
+  @ManyToOne(
+    () => QuestionPaper,
+    (questionPaper) => questionPaper.mcqQuestions,
+    { onDelete: 'CASCADE' },
+  )
   @Exclude({ toPlainOnly: true })
   parentQuestionPaper: QuestionPaper;
 
