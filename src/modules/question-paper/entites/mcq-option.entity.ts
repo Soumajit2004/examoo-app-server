@@ -6,7 +6,9 @@ export class McqOption {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => McqQuestion, (mcqQuestion) => mcqQuestion.mcqOptions)
+  @ManyToOne(() => McqQuestion, (mcqQuestion) => mcqQuestion.mcqOptions, {
+    onDelete: 'CASCADE',
+  })
   parentMcqQuestion: McqQuestion;
 
   @Column()

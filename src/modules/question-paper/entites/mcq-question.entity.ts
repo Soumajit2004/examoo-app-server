@@ -44,7 +44,7 @@ export class McqQuestion {
 
   @OneToMany(() => McqOption, (mcqOption) => mcqOption.parentMcqQuestion, {
     eager: true,
-    cascade: true,
+    onDelete: 'CASCADE',
   })
   mcqOptions: McqOption[];
 }
