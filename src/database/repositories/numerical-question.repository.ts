@@ -31,4 +31,11 @@ export class NumericalQuestionRepository extends Repository<NumericalQuestion> {
 
     return await this.save(numericalQuestion);
   }
+
+  async removeAnswer(numericalQuestion: NumericalQuestion) {
+    numericalQuestion.answerAdded = false;
+    numericalQuestion.answer = null;
+
+    return await this.save(numericalQuestion);
+  }
 }

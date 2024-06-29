@@ -170,8 +170,24 @@ export class QuestionService {
         question,
         addAnswerDto.textAnswer,
       );
-    } else {
-      throw new BadRequestException('question type and answer mismatch');
+    }
+
+    throw new BadRequestException('question type and answer mismatch');
+  }
+
+  async removeAnswer(questionPaperId: string, questionId: string, user: User) {
+    const question = await this.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
+    );
+
+    if (question instanceof McqQuestion) {
+      await this.mcqQuestionRepository.removeAnswer(question);
+    } else if (question instanceof NumericalQuestion) {
+      await this.numericalQuestionRepository.removeAnswer(question);
+    } else if (question instanceof TextQuestion) {
+      await this.textQuestionRepository.removeAnswer(question);
     }
   }
 

@@ -109,4 +109,13 @@ export class QuestionController {
       user,
     );
   }
+
+  @Delete(':questionId/answer')
+  deleteAnswer(
+    @Param('questionPaperId') questionPaperId: string,
+    @Param('questionId') questionId: string,
+    @GetUser() user: User,
+  ) {
+    return this.questionService.removeAnswer(questionPaperId, questionId, user);
+  }
 }
