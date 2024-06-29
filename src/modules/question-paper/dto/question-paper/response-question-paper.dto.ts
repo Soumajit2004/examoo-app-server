@@ -10,8 +10,6 @@ export class QuestionPaperResponseDto {
 
   owner: User;
 
-  candidates: User[];
-
   createdOn: string;
 
   questions: (McqQuestion | NumericalQuestion | TextQuestion)[];

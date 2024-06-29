@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { QuestionPaperRepository } from '../../../database/repositories/question-paper.repository';
 import { CreateQuestionPaperDto } from '../dto/question-paper/create-question-paper.dto';
@@ -13,28 +13,41 @@ export class QuestionPaperService {
     private readonly questionPaperRepository: QuestionPaperRepository,
   ) {}
 
+  formatQuestionPaperResponse(
+    questionPaper: QuestionPaper,
+  ): QuestionPaperResponseDto {
+    const response = {
+      ...questionPaper,
+      questions: [
+        ...questionPaper.mcqQuestions,
+        ...questionPaper.numericalQuestions,
+        ...questionPaper.textQuestions,
+      ],
+    };
+
+    delete response.textQuestions;
+    delete response.mcqQuestions;
+    delete response.numericalQuestions;
+
+    return response;
+  }
+
   async getQuestionPaperById(
     questionPaperId: string,
-  ): Promise<QuestionPaperResponseDto> {
-    const {
-      id,
-      name,
-      owner,
-      createdOn,
-      candidates,
-      textQuestions,
-      mcqQuestions,
-      numericalQuestions,
-    } =
-      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
-    return {
-      id,
-      name,
-      owner,
-      createdOn,
-      candidates,
-      questions: [...textQuestions, ...mcqQuestions, ...numericalQuestions],
-    };
+    user: User,
+  ): Promise<QuestionPaper> {
+    const found = await this.questionPaperRepository.findOneBy({
+      id: questionPaperId,
+      owner: user,
+    });
+
+    if (!found) {
+      throw new NotFoundException(
+        `question paper with id: ${questionPaperId} not found`,
+      );
+    }
+
+    return found;
   }
 
   async createQuestionPaper(
@@ -50,18 +63,16 @@ export class QuestionPaperService {
   async updateQuestionPaper(
     questionPaperId: string,
     updateQuestionPaperDto: UpdateQuestionPaperDto,
+    user: User,
   ): Promise<QuestionPaper> {
-    const { name } = updateQuestionPaperDto;
+    const questionPaper = await this.getQuestionPaperById(
+      questionPaperId,
+      user,
+    );
 
-    const questionPaper =
-      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
-
-    if (name) {
-      questionPaper.name = name;
-    } else {
-      throw new BadRequestException('no change implemented');
-    }
-
-    return await this.questionPaperRepository.save(questionPaper);
+    return await this.questionPaperRepository.updateQuestionPaper(
+      questionPaper,
+      updateQuestionPaperDto,
+    );
   }
 }

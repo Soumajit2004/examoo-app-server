@@ -1,8 +1,6 @@
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -27,10 +25,6 @@ export class QuestionPaper {
 
   @ManyToOne(() => User, (user) => user.questionPapers, { eager: true })
   owner: User;
-
-  @ManyToMany(() => User, { eager: true })
-  @JoinTable()
-  candidates: User[];
 
   @Column({ default: new Date().toISOString() })
   createdOn: string;

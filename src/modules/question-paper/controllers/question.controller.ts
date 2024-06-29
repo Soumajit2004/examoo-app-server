@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Param,
   Patch,
@@ -19,16 +18,12 @@ import { NumericalQuestion } from '../entites/numerical-question.entity';
 import { TextQuestion } from '../entites/text-question.entity';
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
 import { AddAnswerDto } from '../dto/question/add-answer.dto';
-import { QuestionPaperAccessControlService } from '../services/question-paper-access-control.service';
 import { UpdateQuestionDto } from '../dto/question/update-question.dto';
 
 @Controller('question-paper/:questionPaperId/question')
 @UseGuards(AuthGuard())
 export class QuestionController {
-  constructor(
-    private readonly questionService: QuestionService,
-    private readonly questionPaperAccessControlService: QuestionPaperAccessControlService,
-  ) {}
+  constructor(private readonly questionService: QuestionService) {}
 
   @Get('/:questionId')
   async getQuestionById(
@@ -36,17 +31,10 @@ export class QuestionController {
     @Param('questionId') questionId: string,
     @GetUser() user: User,
   ) {
-    if (
-      await this.questionPaperAccessControlService.verifyReadAccessOrFail(
-        questionPaperId,
-        user,
-      )
-    ) {
-      return this.questionService.getQuestionById(questionId);
-    }
-
-    throw new ForbiddenException(
-      `no read privileges to question paper with id:${questionPaperId}`,
+    return this.questionService.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
     );
   }
 
@@ -56,20 +44,10 @@ export class QuestionController {
     @Body() createQuestionDto: CreateQuestionDto,
     @GetUser() user: User,
   ): Promise<McqQuestion | NumericalQuestion | TextQuestion> {
-    if (
-      await this.questionPaperAccessControlService.verifyOwnerAccessOrFail(
-        questionPaperId,
-        user,
-      )
-    ) {
-      return this.questionService.createQuestion(
-        questionPaperId,
-        createQuestionDto,
-      );
-    }
-
-    throw new ForbiddenException(
-      `no owner privileges to question paper with id:${questionPaperId}`,
+    return this.questionService.createQuestion(
+      questionPaperId,
+      createQuestionDto,
+      user,
     );
   }
 
@@ -80,17 +58,11 @@ export class QuestionController {
     @Body() updateQuestionDto: UpdateQuestionDto,
     @GetUser() user: User,
   ) {
-    if (
-      await this.questionPaperAccessControlService.verifyOwnerAccessOrFail(
-        questionPaperId,
-        user,
-      )
-    ) {
-      return this.questionService.updateQuestion(questionId, updateQuestionDto);
-    }
-
-    throw new ForbiddenException(
-      `no owner privileges to question paper with id:${questionPaperId}`,
+    return this.questionService.updateQuestion(
+      questionPaperId,
+      questionId,
+      updateQuestionDto,
+      user,
     );
   }
 
@@ -101,17 +73,11 @@ export class QuestionController {
     @Body() addMcqOptionDto: AddMcqOptionDto,
     @GetUser() user: User,
   ): Promise<McqQuestion> {
-    if (
-      await this.questionPaperAccessControlService.verifyOwnerAccessOrFail(
-        questionPaperId,
-        user,
-      )
-    ) {
-      return this.questionService.addMcqOption(questionId, addMcqOptionDto);
-    }
-
-    throw new ForbiddenException(
-      `no owner privileges to question paper with id:${questionPaperId}`,
+    return this.questionService.addMcqOption(
+      questionPaperId,
+      questionId,
+      addMcqOptionDto,
+      user,
     );
   }
 
@@ -122,17 +88,11 @@ export class QuestionController {
     @Body() addAnswerDto: AddAnswerDto,
     @GetUser() user: User,
   ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
-    if (
-      await this.questionPaperAccessControlService.verifyOwnerAccessOrFail(
-        questionPaperId,
-        user,
-      )
-    ) {
-      return this.questionService.addAnswer(questionId, addAnswerDto);
-    }
-
-    throw new ForbiddenException(
-      `no owner privileges to question paper with id:${questionPaperId}`,
+    return this.questionService.addAnswer(
+      questionPaperId,
+      questionId,
+      addAnswerDto,
+      user,
     );
   }
 }

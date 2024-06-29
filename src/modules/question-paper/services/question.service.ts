@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 
 import { McqQuestionRepository } from '../../../database/repositories/mcq-question.repository';
-import { QuestionPaperRepository } from '../../../database/repositories/question-paper.repository';
 import { McqQuestion } from '../entites/mcq-question.entity';
 import { CreateQuestionDto } from '../dto/question/create-question.dto';
 import { QuestionType } from '../entites/question-paper.entity';
@@ -19,6 +18,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { McqOption } from '../entites/mcq-option.entity';
 import { Repository } from 'typeorm';
 import { UpdateQuestionDto } from '../dto/question/update-question.dto';
+import { QuestionPaperService } from './question-paper.service';
+import { User } from '../../user/entites/user.entity';
 
 @Injectable()
 export class QuestionService {
@@ -26,28 +27,33 @@ export class QuestionService {
     private readonly mcqQuestionRepository: McqQuestionRepository,
     private readonly numericalQuestionRepository: NumericalQuestionRepository,
     private readonly textQuestionRepository: TextQuestionRepository,
-    private readonly questionPaperRepository: QuestionPaperRepository,
     @InjectRepository(McqOption)
     private mcqOptionRepository: Repository<McqOption>,
+    private readonly questionPaperService: QuestionPaperService,
   ) {}
 
   async getQuestionById(
+    questionPaperId: string,
     questionId: string,
+    user: User,
   ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
-    let found: McqQuestion | TextQuestion | NumericalQuestion;
+    const questionPaper = await this.questionPaperService.getQuestionPaperById(
+      questionPaperId,
+      user,
+    );
 
-    for (const repository of [
-      this.mcqQuestionRepository,
-      this.numericalQuestionRepository,
-      this.textQuestionRepository,
-    ]) {
-      found = await repository.findOneBy({
-        id: questionId,
-      });
-
-      if (found) {
-        return found;
+    const filter = [
+      ...questionPaper.numericalQuestions,
+      ...questionPaper.textQuestions,
+      ...questionPaper.mcqQuestions,
+    ].filter((q) => {
+      if (q.id === questionId) {
+        return q;
       }
+    });
+
+    if (filter.length > 0) {
+      return filter[0];
     }
 
     throw new NotFoundException(
@@ -58,9 +64,12 @@ export class QuestionService {
   async createQuestion(
     questionPaperId: string,
     createQuestionDto: CreateQuestionDto,
+    user: User,
   ): Promise<McqQuestion | NumericalQuestion | TextQuestion> {
-    const questionPaper =
-      await this.questionPaperRepository.getQuestionPaperById(questionPaperId);
+    const questionPaper = await this.questionPaperService.getQuestionPaperById(
+      questionPaperId,
+      user,
+    );
 
     switch (createQuestionDto.questionType) {
       case QuestionType.MCQ:
@@ -84,12 +93,19 @@ export class QuestionService {
   }
 
   async updateQuestion(
+    questionPaperId: string,
     questionId: string,
     updateQuestionDto: UpdateQuestionDto,
+    user: User,
   ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
     const { questionText } = updateQuestionDto;
 
-    const question = await this.getQuestionById(questionId);
+    const question = await this.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
+    );
+
     question.questionText = questionText;
 
     if (question instanceof McqQuestion) {
@@ -104,10 +120,16 @@ export class QuestionService {
   }
 
   async addAnswer(
+    questionPaperId: string,
     questionId: string,
     addAnswerDto: AddAnswerDto,
+    user: User,
   ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
-    const question = await this.getQuestionById(questionId);
+    const question = await this.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
+    );
 
     if (question instanceof McqQuestion && addAnswerDto.mcqOptionId) {
       const option = await this.mcqOptionRepository.findOneOrFail({
@@ -134,21 +156,24 @@ export class QuestionService {
   }
 
   async addMcqOption(
+    questionPaperId: string,
     questionId: string,
     addMcqOptionDto: AddMcqOptionDto,
+    user: User,
   ): Promise<McqQuestion> {
-    const mcqQuestion = await this.getQuestionById(questionId);
+    const question = await this.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
+    );
 
     if (
-      mcqQuestion instanceof McqQuestion &&
-      mcqQuestion.questionType === QuestionType.MCQ
+      question instanceof McqQuestion &&
+      question.questionType === QuestionType.MCQ
     ) {
-      return this.mcqQuestionRepository.addMcqOption(
-        mcqQuestion,
-        addMcqOptionDto,
-      );
+      return this.mcqQuestionRepository.addMcqOption(question, addMcqOptionDto);
     }
 
-    throw new BadRequestException(`invalid question type`);
+    throw new BadRequestException(`question must be of mmq type`);
   }
 }
