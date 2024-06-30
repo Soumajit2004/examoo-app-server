@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserProfile } from './entites/user/user-profile.entity';
-import { User } from './entites/user/user.entity';
+import { User } from './entites/user.entity';
 import { QuestionPaper } from './entites/question-paper/question-paper.entity';
 import { McqQuestion } from './entites/question-paper/question/mcq-question.entity';
 import { McqOption } from './entites/question-paper/question/mcq-option.entity';
@@ -12,14 +11,13 @@ import { QuestionPaperRepository } from './repositories/question-paper/question-
 import { McqQuestionRepository } from './repositories/question-paper/question/mcq-question.repository';
 import { NumericalQuestionRepository } from './repositories/question-paper/question/numerical-question.repository';
 import { TextQuestionRepository } from './repositories/question-paper/question/text-question.repository';
-import { UserRepository } from './repositories/user.repository';
+import { UserRepository } from './repositories/user/user.repository';
 import { McqOptionRepository } from './repositories/question-paper/question/mcq-option.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       User,
-      UserProfile,
       QuestionPaper,
       McqQuestion,
       McqOption,

@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../user/user.entity';
+import { User } from '../user.entity';
 import { McqQuestion } from './question/mcq-question.entity';
 import { TextQuestion } from './question/text-question.entity';
 import { NumericalQuestion } from './question/numerical-question.entity';

@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { UploadService } from './upload.service';
+import { UploadService } from '../upload.service';
 
 @Injectable()
 export class McqOptionImageUploadService {

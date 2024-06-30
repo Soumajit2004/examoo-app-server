@@ -5,7 +5,7 @@ import { UpdateQuestionPaperDto } from '../dto/question-paper/update-question-pa
 import { QuestionPaperResponseDto } from '../dto/question-paper/response-question-paper.dto';
 import { QuestionPaperRepository } from '../../../common/database/repositories/question-paper/question-paper.repository';
 import { QuestionPaper } from '../../../common/database/entites/question-paper/question-paper.entity';
-import { User } from '../../../common/database/entites/user/user.entity';
+import { User } from '../../../common/database/entites/user.entity';
 
 @Injectable()
 export class QuestionPaperService {

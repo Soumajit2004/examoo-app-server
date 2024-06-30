@@ -12,15 +12,15 @@ import { QuestionPaperService } from './question-paper.service';
 import { McqQuestionRepository } from '../../../common/database/repositories/question-paper/question/mcq-question.repository';
 import { NumericalQuestionRepository } from '../../../common/database/repositories/question-paper/question/numerical-question.repository';
 import { TextQuestionRepository } from '../../../common/database/repositories/question-paper/question/text-question.repository';
-import { User } from '../../../common/database/entites/user/user.entity';
+import { User } from '../../../common/database/entites/user.entity';
 import { McqQuestion } from '../../../common/database/entites/question-paper/question/mcq-question.entity';
 import { TextQuestion } from '../../../common/database/entites/question-paper/question/text-question.entity';
 import { NumericalQuestion } from '../../../common/database/entites/question-paper/question/numerical-question.entity';
 import { CreateQuestionDto } from '../dto/question/create-question.dto';
 import { QuestionType } from '../../../common/database/entites/question-paper/question-paper.entity';
 import { McqOptionRepository } from '../../../common/database/repositories/question-paper/question/mcq-option.repository';
-import { QuestionImageUploadService } from '../../../common/upload/question-image-upload.service';
-import { McqOptionImageUploadService } from '../../../common/upload/mcq-option-image-upload.service';
+import { QuestionImageUploadService } from '../../../common/upload/question-paper/question-image-upload.service';
+import { McqOptionImageUploadService } from '../../../common/upload/question-paper/mcq-option-image-upload.service';
 
 @Injectable()
 export class QuestionService {

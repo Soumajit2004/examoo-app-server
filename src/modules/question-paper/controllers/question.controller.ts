@@ -21,7 +21,7 @@ import { GetUser } from '../../auth/decorators/get-user.decorator';
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
 import { AddAnswerDto } from '../dto/question/add-answer.dto';
 import { UpdateQuestionDto } from '../dto/question/update-question.dto';
-import { User } from '../../../common/database/entites/user/user.entity';
+import { User } from '../../../common/database/entites/user.entity';
 import { NumericalQuestion } from '../../../common/database/entites/question-paper/question/numerical-question.entity';
 import { TextQuestion } from '../../../common/database/entites/question-paper/question/text-question.entity';
 import { McqQuestion } from '../../../common/database/entites/question-paper/question/mcq-question.entity';
