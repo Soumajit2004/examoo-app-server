@@ -4,22 +4,20 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { McqQuestionRepository } from '../../../database/repositories/mcq-question.repository';
-import { McqQuestion } from '../entites/mcq-question.entity';
-import { CreateQuestionDto } from '../dto/question/create-question.dto';
-import { QuestionType } from '../entites/question-paper.entity';
-import { NumericalQuestionRepository } from '../../../database/repositories/numerical-question.repository';
-import { NumericalQuestion } from '../entites/numerical-question.entity';
-import { TextQuestionRepository } from '../../../database/repositories/text-question.repository';
-import { TextQuestion } from '../entites/text-question.entity';
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
 import { AddAnswerDto } from '../dto/question/add-answer.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { McqOption } from '../entites/mcq-option.entity';
-import { Repository } from 'typeorm';
 import { UpdateQuestionDto } from '../dto/question/update-question.dto';
 import { QuestionPaperService } from './question-paper.service';
-import { User } from '../../user/entites/user.entity';
+import { McqQuestionRepository } from '../../../common/database/repositories/question-paper/question/mcq-question.repository';
+import { NumericalQuestionRepository } from '../../../common/database/repositories/question-paper/question/numerical-question.repository';
+import { TextQuestionRepository } from '../../../common/database/repositories/question-paper/question/text-question.repository';
+import { User } from '../../../common/database/entites/user/user.entity';
+import { McqQuestion } from '../../../common/database/entites/question-paper/question/mcq-question.entity';
+import { TextQuestion } from '../../../common/database/entites/question-paper/question/text-question.entity';
+import { NumericalQuestion } from '../../../common/database/entites/question-paper/question/numerical-question.entity';
+import { CreateQuestionDto } from '../dto/question/create-question.dto';
+import { QuestionType } from '../../../common/database/entites/question-paper/question-paper.entity';
+import { McqOptionRepository } from '../../../common/database/repositories/question-paper/question/mcq-option.repository';
 
 @Injectable()
 export class QuestionService {
@@ -27,8 +25,7 @@ export class QuestionService {
     private readonly mcqQuestionRepository: McqQuestionRepository,
     private readonly numericalQuestionRepository: NumericalQuestionRepository,
     private readonly textQuestionRepository: TextQuestionRepository,
-    @InjectRepository(McqOption)
-    private mcqOptionRepository: Repository<McqOption>,
+    private mcqOptionRepository: McqOptionRepository,
     private readonly questionPaperService: QuestionPaperService,
   ) {}
 

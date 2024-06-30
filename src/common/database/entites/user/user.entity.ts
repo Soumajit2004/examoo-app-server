@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserProfile } from './user-profile.entity';
-import { QuestionPaper } from '../../question-paper/entites/question-paper.entity';
+import { QuestionPaper } from '../question-paper/question-paper.entity';
 import { Exclude } from 'class-transformer';
 
 @Entity()

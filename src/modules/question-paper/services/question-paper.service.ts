@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { QuestionPaperRepository } from '../../../database/repositories/question-paper.repository';
 import { CreateQuestionPaperDto } from '../dto/question-paper/create-question-paper.dto';
-import { User } from '../../user/entites/user.entity';
-import { QuestionPaper } from '../entites/question-paper.entity';
 import { UpdateQuestionPaperDto } from '../dto/question-paper/update-question-paper.dto';
 import { QuestionPaperResponseDto } from '../dto/question-paper/response-question-paper.dto';
+import { QuestionPaperRepository } from '../../../common/database/repositories/question-paper/question-paper.repository';
+import { QuestionPaper } from '../../../common/database/entites/question-paper/question-paper.entity';
+import { User } from '../../../common/database/entites/user/user.entity';
 
 @Injectable()
 export class QuestionPaperService {

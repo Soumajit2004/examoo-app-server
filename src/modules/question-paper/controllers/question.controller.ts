@@ -13,13 +13,13 @@ import { AuthGuard } from '@nestjs/passport';
 import { QuestionService } from '../services/question.service';
 import { CreateQuestionDto } from '../dto/question/create-question.dto';
 import { GetUser } from '../../auth/decorators/get-user.decorator';
-import { User } from '../../user/entites/user.entity';
-import { McqQuestion } from '../entites/mcq-question.entity';
-import { NumericalQuestion } from '../entites/numerical-question.entity';
-import { TextQuestion } from '../entites/text-question.entity';
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
 import { AddAnswerDto } from '../dto/question/add-answer.dto';
 import { UpdateQuestionDto } from '../dto/question/update-question.dto';
+import { User } from '../../../common/database/entites/user/user.entity';
+import { NumericalQuestion } from '../../../common/database/entites/question-paper/question/numerical-question.entity';
+import { TextQuestion } from '../../../common/database/entites/question-paper/question/text-question.entity';
+import { McqQuestion } from '../../../common/database/entites/question-paper/question/mcq-question.entity';
 
 @Controller('question-paper/:questionPaperId/question')
 @UseGuards(AuthGuard())

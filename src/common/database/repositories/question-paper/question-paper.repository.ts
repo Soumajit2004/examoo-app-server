@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { QuestionPaper } from '../../modules/question-paper/entites/question-paper.entity';
-import { CreateQuestionPaperDto } from '../../modules/question-paper/dto/question-paper/create-question-paper.dto';
-import { User } from '../../modules/user/entites/user.entity';
-import { UpdateQuestionPaperDto } from '../../modules/question-paper/dto/question-paper/update-question-paper.dto';
+import { QuestionPaper } from '../../entites/question-paper/question-paper.entity';
+import { User } from '../../entites/user/user.entity';
+import { CreateQuestionPaperDto } from '../../../../modules/question-paper/dto/question-paper/create-question-paper.dto';
+import { UpdateQuestionPaperDto } from '../../../../modules/question-paper/dto/question-paper/update-question-paper.dto';
 
 @Injectable()
 export class QuestionPaperRepository extends Repository<QuestionPaper> {

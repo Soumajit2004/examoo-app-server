@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { McqQuestion } from '../../modules/question-paper/entites/mcq-question.entity';
-import { QuestionPaper } from '../../modules/question-paper/entites/question-paper.entity';
-import { CreateQuestionDto } from '../../modules/question-paper/dto/question/create-question.dto';
-import { AddMcqOptionDto } from '../../modules/question-paper/dto/question/add-mcq-option.dto';
-import { McqOption } from '../../modules/question-paper/entites/mcq-option.entity';
+import { McqQuestion } from '../../../entites/question-paper/question/mcq-question.entity';
+import { QuestionPaper } from '../../../entites/question-paper/question-paper.entity';
+import { McqOption } from '../../../entites/question-paper/question/mcq-option.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateQuestionDto } from '../../../../../modules/question-paper/dto/question/create-question.dto';
+import { AddMcqOptionDto } from '../../../../../modules/question-paper/dto/question/add-mcq-option.dto';
 
 @Injectable()
 export class McqQuestionRepository extends Repository<McqQuestion> {

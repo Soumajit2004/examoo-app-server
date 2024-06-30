@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { QuestionPaper } from '../../modules/question-paper/entites/question-paper.entity';
-import { CreateQuestionDto } from '../../modules/question-paper/dto/question/create-question.dto';
-import { NumericalQuestion } from '../../modules/question-paper/entites/numerical-question.entity';
+import { QuestionPaper } from '../../../entites/question-paper/question-paper.entity';
+import { NumericalQuestion } from '../../../entites/question-paper/question/numerical-question.entity';
+import { CreateQuestionDto } from '../../../../../modules/question-paper/dto/question/create-question.dto';
 
 @Injectable()
 export class NumericalQuestionRepository extends Repository<NumericalQuestion> {

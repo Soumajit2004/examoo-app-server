@@ -1,7 +1,7 @@
-import { TextQuestion } from '../../entites/text-question.entity';
-import { NumericalQuestion } from '../../entites/numerical-question.entity';
-import { McqQuestion } from '../../entites/mcq-question.entity';
-import { User } from '../../../user/entites/user.entity';
+import { User } from '../../../../common/database/entites/user/user.entity';
+import { McqQuestion } from '../../../../common/database/entites/question-paper/question/mcq-question.entity';
+import { NumericalQuestion } from '../../../../common/database/entites/question-paper/question/numerical-question.entity';
+import { TextQuestion } from '../../../../common/database/entites/question-paper/question/text-question.entity';
 
 export class QuestionPaperResponseDto {
   id: string;

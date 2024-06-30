@@ -5,10 +5,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../../user/entites/user.entity';
-import { McqQuestion } from './mcq-question.entity';
-import { TextQuestion } from './text-question.entity';
-import { NumericalQuestion } from './numerical-question.entity';
+import { User } from '../user/user.entity';
+import { McqQuestion } from './question/mcq-question.entity';
+import { TextQuestion } from './question/text-question.entity';
+import { NumericalQuestion } from './question/numerical-question.entity';
 
 export enum QuestionType {
   MCQ = 'mcq',

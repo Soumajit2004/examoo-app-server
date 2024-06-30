@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { QuestionPaper } from './question-paper.entity';
+import { QuestionPaper } from '../question-paper.entity';
 import { Exclude } from 'class-transformer';
 
 enum QuestionType {
@@ -9,7 +9,7 @@ enum QuestionType {
 }
 
 @Entity()
-export class TextQuestion {
+export class NumericalQuestion {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -30,7 +30,7 @@ export class TextQuestion {
   @Column({ default: false })
   answerAdded: boolean;
 
-  @Column({ type: 'mediumtext', nullable: true })
+  @Column({ type: 'float', nullable: true })
   @Exclude({ toPlainOnly: true })
-  answer?: string;
+  answer?: number;
 }
