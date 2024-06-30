@@ -13,7 +13,4 @@ export class McqOption {
 
   @Column()
   text: string;
-
-  @Column({ nullable: true })
-  imageUrl?: string;
 }

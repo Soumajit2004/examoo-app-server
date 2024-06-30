@@ -1,19 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
 import { McqQuestion } from '../../../entites/question-paper/question/mcq-question.entity';
 import { QuestionPaper } from '../../../entites/question-paper/question-paper.entity';
 import { McqOption } from '../../../entites/question-paper/question/mcq-option.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { CreateQuestionDto } from '../../../../../modules/question-paper/dto/question/create-question.dto';
 import { AddMcqOptionDto } from '../../../../../modules/question-paper/dto/question/add-mcq-option.dto';
+import { McqOptionRepository } from './mcq-option.repository';
 
 @Injectable()
 export class McqQuestionRepository extends Repository<McqQuestion> {
+  logger = new Logger();
+
   constructor(
     private dataSource: DataSource,
-    @InjectRepository(McqOption)
-    private mcqOptionRepository: Repository<McqOption>,
+    private readonly mcqOptionRepository: McqOptionRepository,
   ) {
     super(McqQuestion, dataSource.createEntityManager());
   }

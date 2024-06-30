@@ -43,6 +43,7 @@ lerna-debug.log*
 .env.local
 
 firebaseServiceAccountKey.json
+gcpServiceAccountKey.json
 
 # temp directory
 .temp

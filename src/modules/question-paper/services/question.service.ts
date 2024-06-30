@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -18,15 +19,21 @@ import { NumericalQuestion } from '../../../common/database/entites/question-pap
 import { CreateQuestionDto } from '../dto/question/create-question.dto';
 import { QuestionType } from '../../../common/database/entites/question-paper/question-paper.entity';
 import { McqOptionRepository } from '../../../common/database/repositories/question-paper/question/mcq-option.repository';
+import { QuestionImageUploadService } from '../../../common/upload/question-image-upload.service';
+import { McqOptionImageUploadService } from '../../../common/upload/mcq-option-image-upload.service';
 
 @Injectable()
 export class QuestionService {
+  logger = new Logger(QuestionService.name);
+
   constructor(
     private readonly mcqQuestionRepository: McqQuestionRepository,
     private readonly numericalQuestionRepository: NumericalQuestionRepository,
     private readonly textQuestionRepository: TextQuestionRepository,
-    private mcqOptionRepository: McqOptionRepository,
+    private readonly mcqOptionRepository: McqOptionRepository,
     private readonly questionPaperService: QuestionPaperService,
+    private readonly questionImageUploadService: QuestionImageUploadService,
+    private readonly mcqOptionImageUploadService: McqOptionImageUploadService,
   ) {}
 
   async getQuestionById(
@@ -62,31 +69,38 @@ export class QuestionService {
     questionPaperId: string,
     createQuestionDto: CreateQuestionDto,
     user: User,
+    imageFile?: Express.Multer.File,
   ): Promise<McqQuestion | NumericalQuestion | TextQuestion> {
     const questionPaper = await this.questionPaperService.getQuestionPaperById(
       questionPaperId,
       user,
     );
+    let question: McqQuestion | NumericalQuestion | TextQuestion;
 
-    switch (createQuestionDto.questionType) {
-      case QuestionType.MCQ:
-        return this.mcqQuestionRepository.createMcqQuestion(
-          questionPaper,
-          createQuestionDto,
-        );
-      case QuestionType.NUMERICAL:
-        return this.numericalQuestionRepository.createNumericalQuestion(
-          questionPaper,
-          createQuestionDto,
-        );
-      case QuestionType.TEXT:
-        return this.textQuestionRepository.createTextQuestion(
-          questionPaper,
-          createQuestionDto,
-        );
-      default:
-        throw new BadRequestException('invalid question type');
+    const { questionType } = createQuestionDto;
+    if (questionType === QuestionType.MCQ) {
+      question = await this.mcqQuestionRepository.createMcqQuestion(
+        questionPaper,
+        createQuestionDto,
+      );
+    } else if (questionType === QuestionType.NUMERICAL) {
+      question = await this.numericalQuestionRepository.createNumericalQuestion(
+        questionPaper,
+        createQuestionDto,
+      );
+    } else if (questionType === QuestionType.TEXT) {
+      question = await this.textQuestionRepository.createTextQuestion(
+        questionPaper,
+        createQuestionDto,
+      );
     }
+    this.logger.verbose(`Created question paper with id: ${question.id}`);
+
+    if (imageFile) {
+      await this.questionImageUploadService.uploadImage(question.id, imageFile);
+    }
+
+    return question;
   }
 
   async updateQuestion(
@@ -193,6 +207,7 @@ export class QuestionService {
     questionId: string,
     addMcqOptionDto: AddMcqOptionDto,
     user: User,
+    imageFile?: Express.Multer.File,
   ): Promise<McqQuestion> {
     const question = await this.getQuestionById(
       questionPaperId,
@@ -204,9 +219,21 @@ export class QuestionService {
       question instanceof McqQuestion &&
       question.questionType === QuestionType.MCQ
     ) {
-      return this.mcqQuestionRepository.addMcqOption(question, addMcqOptionDto);
+      const option = await this.mcqQuestionRepository.addMcqOption(
+        question,
+        addMcqOptionDto,
+      );
+
+      if (imageFile) {
+        await this.mcqOptionImageUploadService.uploadImage(
+          option.id,
+          imageFile,
+        );
+      }
+
+      return option;
     }
 
-    throw new BadRequestException(`question must be of mmq type`);
+    throw new BadRequestException(`question must be of mcq type`);
   }
 }
