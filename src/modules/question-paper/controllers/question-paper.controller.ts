@@ -12,10 +12,10 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { CreateQuestionPaperDto } from '../dto/question-paper/create-question-paper.dto';
 import { GetUser } from '../../auth/decorators/get-user.decorator';
-import { User } from '../../user/entites/user.entity';
 import { QuestionPaperService } from '../services/question-paper.service';
 import { UpdateQuestionPaperDto } from '../dto/question-paper/update-question-paper.dto';
 import { QuestionPaperResponseDto } from '../dto/question-paper/response-question-paper.dto';
+import { User } from '../../../common/database/entites/user.entity';
 
 @Controller('question-paper')
 @UseGuards(AuthGuard())

@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { QuestionType } from '../../entites/question-paper.entity';
+import { QuestionType } from '../../../../common/database/entites/question-paper/question-paper.entity';
 
 export class CreateQuestionDto {
   @IsNotEmpty()

@@ -1,6 +1,14 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { QuestionPaper } from './question-paper.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
+
+import { QuestionPaper } from '../question-paper.entity';
+import { McqOption } from './mcq-option.entity';
 
 enum QuestionType {
   MCQ = 'mcq',
@@ -9,7 +17,7 @@ enum QuestionType {
 }
 
 @Entity()
-export class NumericalQuestion {
+export class McqQuestion {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -24,13 +32,19 @@ export class NumericalQuestion {
   @Exclude({ toPlainOnly: true })
   parentQuestionPaper: QuestionPaper;
 
-  @Column({ type: 'enum', enum: QuestionType, default: QuestionType.NUMERICAL })
+  @Column({ type: 'enum', enum: QuestionType, default: QuestionType.MCQ })
   questionType: QuestionType;
 
   @Column({ default: false })
   answerAdded: boolean;
 
-  @Column({ type: 'float', nullable: true })
+  @Column({ nullable: true })
   @Exclude({ toPlainOnly: true })
-  answer?: number;
+  answer: string;
+
+  @OneToMany(() => McqOption, (mcqOption) => mcqOption.parentMcqQuestion, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  mcqOptions: McqOption[];
 }

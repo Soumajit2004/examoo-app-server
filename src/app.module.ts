@@ -8,6 +8,8 @@ import { UserModule } from './modules/user/user.module';
 
 import { configValidationSchema } from './config.schema';
 import { QuestionPaperModule } from './modules/question-paper/question-paper.module';
+import { DatabaseModule } from './common/database/database.module';
+import { UploadModule } from './common/upload/upload.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { QuestionPaperModule } from './modules/question-paper/question-paper.mod
     AuthModule,
     UserModule,
     QuestionPaperModule,
+    DatabaseModule,
+    UploadModule,
   ],
 })
 export class AppModule {}

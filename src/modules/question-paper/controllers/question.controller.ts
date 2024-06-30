@@ -2,24 +2,30 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { QuestionService } from '../services/question.service';
 import { CreateQuestionDto } from '../dto/question/create-question.dto';
 import { GetUser } from '../../auth/decorators/get-user.decorator';
-import { User } from '../../user/entites/user.entity';
-import { McqQuestion } from '../entites/mcq-question.entity';
-import { NumericalQuestion } from '../entites/numerical-question.entity';
-import { TextQuestion } from '../entites/text-question.entity';
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
 import { AddAnswerDto } from '../dto/question/add-answer.dto';
 import { UpdateQuestionDto } from '../dto/question/update-question.dto';
+import { User } from '../../../common/database/entites/user.entity';
+import { NumericalQuestion } from '../../../common/database/entites/question-paper/question/numerical-question.entity';
+import { TextQuestion } from '../../../common/database/entites/question-paper/question/text-question.entity';
+import { McqQuestion } from '../../../common/database/entites/question-paper/question/mcq-question.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('question-paper/:questionPaperId/question')
 @UseGuards(AuthGuard())
@@ -40,15 +46,27 @@ export class QuestionController {
   }
 
   @Post('/new')
+  @UseInterceptors(FileInterceptor('imageFile'))
   async createQuestion(
     @Param('questionPaperId') questionPaperId: string,
     @Body() createQuestionDto: CreateQuestionDto,
     @GetUser() user: User,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5000000 }),
+          new FileTypeValidator({ fileType: 'image/(jpg|png|jpeg)' }),
+        ],
+        fileIsRequired: false,
+      }),
+    )
+    imageFile?: Express.Multer.File,
   ): Promise<McqQuestion | NumericalQuestion | TextQuestion> {
     return this.questionService.createQuestion(
       questionPaperId,
       createQuestionDto,
       user,
+      imageFile,
     );
   }
 
@@ -81,17 +99,29 @@ export class QuestionController {
   }
 
   @Patch(':questionId/mcq/option')
+  @UseInterceptors(FileInterceptor('imageFile'))
   async addMcqOption(
     @Param('questionPaperId') questionPaperId: string,
     @Param('questionId') questionId: string,
     @Body() addMcqOptionDto: AddMcqOptionDto,
     @GetUser() user: User,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5000000 }),
+          new FileTypeValidator({ fileType: 'image/(jpg|png|jpeg)' }),
+        ],
+        fileIsRequired: false,
+      }),
+    )
+    imageFile?: Express.Multer.File,
   ): Promise<McqQuestion> {
     return this.questionService.addMcqOption(
       questionPaperId,
       questionId,
       addMcqOptionDto,
       user,
+      imageFile,
     );
   }
 
