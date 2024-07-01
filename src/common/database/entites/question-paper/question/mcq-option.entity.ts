@@ -13,4 +13,7 @@ export class McqOption {
 
   @Column()
   text: string;
+
+  @Column({ default: false })
+  isImageAdded: boolean;
 }

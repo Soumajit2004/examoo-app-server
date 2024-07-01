@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
-import { AddAnswerDto } from '../dto/question/add-answer.dto';
 import { UpdateQuestionDto } from '../dto/question/update-question.dto';
 import { QuestionPaperService } from './question-paper.service';
 import { McqQuestionRepository } from '../../../common/database/repositories/question-paper/question/mcq-question.repository';
@@ -21,6 +20,7 @@ import { QuestionType } from '../../../common/database/entites/question-paper/qu
 import { McqOptionRepository } from '../../../common/database/repositories/question-paper/question/mcq-option.repository';
 import { QuestionImageUploadService } from '../../../common/upload/question-paper/question-image-upload.service';
 import { McqOptionImageUploadService } from '../../../common/upload/question-paper/mcq-option-image-upload.service';
+import { McqOption } from '../../../common/database/entites/question-paper/question/mcq-option.entity';
 
 @Injectable()
 export class QuestionService {
@@ -150,43 +150,13 @@ export class QuestionService {
     }
   }
 
-  async addAnswer(
+  async addMcqOption(
     questionPaperId: string,
     questionId: string,
-    addAnswerDto: AddAnswerDto,
+    addMcqOptionDto: AddMcqOptionDto,
     user: User,
-  ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
-    const question = await this.getQuestionById(
-      questionPaperId,
-      questionId,
-      user,
-    );
-
-    if (question instanceof McqQuestion && addAnswerDto.mcqOptionId) {
-      const option = await this.mcqOptionRepository.findOneOrFail({
-        where: { id: addAnswerDto.mcqOptionId },
-      });
-
-      return this.mcqQuestionRepository.addAnswer(question, option);
-    } else if (
-      question instanceof NumericalQuestion &&
-      addAnswerDto.numericalAnswer
-    ) {
-      return this.numericalQuestionRepository.addAnswer(
-        question,
-        addAnswerDto.numericalAnswer,
-      );
-    } else if (question instanceof TextQuestion && addAnswerDto.textAnswer) {
-      return this.textQuestionRepository.addAnswer(
-        question,
-        addAnswerDto.textAnswer,
-      );
-    }
-
-    throw new BadRequestException('question type and answer mismatch');
-  }
-
-  async removeAnswer(questionPaperId: string, questionId: string, user: User) {
+    imageFile?: Express.Multer.File,
+  ): Promise<McqOption> {
     const question = await this.getQuestionById(
       questionPaperId,
       questionId,
@@ -194,31 +164,6 @@ export class QuestionService {
     );
 
     if (question instanceof McqQuestion) {
-      await this.mcqQuestionRepository.removeAnswer(question);
-    } else if (question instanceof NumericalQuestion) {
-      await this.numericalQuestionRepository.removeAnswer(question);
-    } else if (question instanceof TextQuestion) {
-      await this.textQuestionRepository.removeAnswer(question);
-    }
-  }
-
-  async addMcqOption(
-    questionPaperId: string,
-    questionId: string,
-    addMcqOptionDto: AddMcqOptionDto,
-    user: User,
-    imageFile?: Express.Multer.File,
-  ): Promise<McqQuestion> {
-    const question = await this.getQuestionById(
-      questionPaperId,
-      questionId,
-      user,
-    );
-
-    if (
-      question instanceof McqQuestion &&
-      question.questionType === QuestionType.MCQ
-    ) {
       const option = await this.mcqQuestionRepository.addMcqOption(
         question,
         addMcqOptionDto,
@@ -229,11 +174,38 @@ export class QuestionService {
           option.id,
           imageFile,
         );
+
+        option.isImageAdded = true;
+
+        return await this.mcqOptionRepository.save(option);
       }
 
       return option;
     }
 
     throw new BadRequestException(`question must be of mcq type`);
+  }
+
+  async removeMcqOption(
+    questionPaperId: string,
+    questionId: string,
+    optionId: string,
+    user: User,
+  ): Promise<void> {
+    const question = await this.getQuestionById(
+      questionPaperId,
+      questionId,
+      user,
+    );
+
+    if (question instanceof McqQuestion) {
+      question.mcqOptions.forEach((o) => {
+        if (o.id === optionId) {
+          this.mcqOptionRepository.remove(o);
+        }
+      });
+    } else {
+      throw new BadRequestException('question must be of mcq type');
+    }
   }
 }

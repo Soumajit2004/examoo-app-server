@@ -19,13 +19,13 @@ import { QuestionService } from '../services/question.service';
 import { CreateQuestionDto } from '../dto/question/create-question.dto';
 import { GetUser } from '../../auth/decorators/get-user.decorator';
 import { AddMcqOptionDto } from '../dto/question/add-mcq-option.dto';
-import { AddAnswerDto } from '../dto/question/add-answer.dto';
 import { UpdateQuestionDto } from '../dto/question/update-question.dto';
 import { User } from '../../../common/database/entites/user.entity';
 import { NumericalQuestion } from '../../../common/database/entites/question-paper/question/numerical-question.entity';
 import { TextQuestion } from '../../../common/database/entites/question-paper/question/text-question.entity';
 import { McqQuestion } from '../../../common/database/entites/question-paper/question/mcq-question.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { McqOption } from '../../../common/database/entites/question-paper/question/mcq-option.entity';
 
 @Controller('question-paper/:questionPaperId/question')
 @UseGuards(AuthGuard())
@@ -114,8 +114,8 @@ export class QuestionController {
         fileIsRequired: false,
       }),
     )
-    imageFile?: Express.Multer.File,
-  ): Promise<McqQuestion> {
+    imageFile: Express.Multer.File,
+  ): Promise<McqOption> {
     return this.questionService.addMcqOption(
       questionPaperId,
       questionId,
@@ -125,27 +125,18 @@ export class QuestionController {
     );
   }
 
-  @Patch(':questionId/answer')
-  async addAnswer(
+  @Delete(':questionId/mcq/option/:optionId')
+  removeMcqOption(
     @Param('questionPaperId') questionPaperId: string,
     @Param('questionId') questionId: string,
-    @Body() addAnswerDto: AddAnswerDto,
-    @GetUser() user: User,
-  ): Promise<McqQuestion | TextQuestion | NumericalQuestion> {
-    return this.questionService.addAnswer(
-      questionPaperId,
-      questionId,
-      addAnswerDto,
-      user,
-    );
-  }
-
-  @Delete(':questionId/answer')
-  deleteAnswer(
-    @Param('questionPaperId') questionPaperId: string,
-    @Param('questionId') questionId: string,
+    @Param('optionId') optionId: string,
     @GetUser() user: User,
   ) {
-    return this.questionService.removeAnswer(questionPaperId, questionId, user);
+    return this.questionService.removeMcqOption(
+      questionPaperId,
+      questionId,
+      optionId,
+      user,
+    );
   }
 }

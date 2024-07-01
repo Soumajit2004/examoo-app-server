@@ -7,10 +7,12 @@ import { QuestionService } from './services/question.service';
 import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../../common/database/database.module';
 import { UploadModule } from '../../common/upload/upload.module';
+import { AnswerController } from './controllers/answer.controller';
+import { AnswerService } from './services/answer.service';
 
 @Module({
   imports: [AuthModule, DatabaseModule, UploadModule],
-  providers: [QuestionPaperService, QuestionService],
-  controllers: [QuestionPaperController, QuestionController],
+  providers: [QuestionPaperService, QuestionService, AnswerService],
+  controllers: [QuestionPaperController, QuestionController, AnswerController],
 })
 export class QuestionPaperModule {}

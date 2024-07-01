@@ -47,8 +47,9 @@ export class McqQuestionRepository extends Repository<McqQuestion> {
     mcqQuestion.mcqOptions = [option, ...mcqQuestion.mcqOptions];
 
     await this.mcqOptionRepository.save(option);
+    await this.save(mcqQuestion);
 
-    return await this.save(mcqQuestion);
+    return option;
   }
 
   async addAnswer(mcqQuestion: McqQuestion, correctOption: McqOption) {
