@@ -1,6 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { QuestionPaper } from './question-paper/question-paper.entity';
-import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -12,10 +11,6 @@ export class User {
 
   @Column({ unique: true })
   email: string;
-
-  @Column()
-  @Exclude({ toPlainOnly: true })
-  password: string;
 
   @OneToMany(() => QuestionPaper, (questionPaper) => questionPaper.owner)
   questionPapers: QuestionPaper[];
